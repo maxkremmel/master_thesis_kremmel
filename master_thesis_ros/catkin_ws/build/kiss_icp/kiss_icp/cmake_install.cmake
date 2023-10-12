@@ -1,8 +1,8 @@
-# Install script for directory: /home/max/master_thesis_ros/catkin_ws/src/kiss-icp/cpp/kiss_icp
+# Install script for directory: /home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/kiss-icp/cpp/kiss_icp
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "/home/max/master_thesis_ros/catkin_ws/install")
+  set(CMAKE_INSTALL_PREFIX "/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/install")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -39,26 +39,26 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("/home/max/master_thesis_ros/catkin_ws/build/kiss_icp/_deps/sophus-build/cmake_install.cmake")
+  include("/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/build/kiss_icp/_deps/sophus-build/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("/home/max/master_thesis_ros/catkin_ws/build/kiss_icp/_deps/tessil-build/cmake_install.cmake")
+  include("/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/build/kiss_icp/_deps/tessil-build/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("/home/max/master_thesis_ros/catkin_ws/build/kiss_icp/kiss_icp/core/cmake_install.cmake")
+  include("/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/build/kiss_icp/kiss_icp/core/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("/home/max/master_thesis_ros/catkin_ws/build/kiss_icp/kiss_icp/metrics/cmake_install.cmake")
+  include("/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/build/kiss_icp/kiss_icp/metrics/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("/home/max/master_thesis_ros/catkin_ws/build/kiss_icp/kiss_icp/pipeline/cmake_install.cmake")
+  include("/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/build/kiss_icp/kiss_icp/pipeline/cmake_install.cmake")
 endif()
 

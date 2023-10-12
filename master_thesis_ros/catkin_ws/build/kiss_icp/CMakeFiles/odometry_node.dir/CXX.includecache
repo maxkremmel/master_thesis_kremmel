@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/max/master_thesis_ros/catkin_ws/src/kiss-icp/cpp/kiss_icp/core/Deskew.hpp
+/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/kiss-icp/cpp/kiss_icp/core/Deskew.hpp
 Eigen/Core
 -
 sophus/se3.hpp
@@ -14,11 +14,11 @@ sophus/se3.hpp
 vector
 -
 
-/home/max/master_thesis_ros/catkin_ws/src/kiss-icp/cpp/kiss_icp/core/Threshold.hpp
+/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/kiss-icp/cpp/kiss_icp/core/Threshold.hpp
 sophus/se3.hpp
 -
 
-/home/max/master_thesis_ros/catkin_ws/src/kiss-icp/cpp/kiss_icp/core/VoxelHashMap.hpp
+/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/kiss-icp/cpp/kiss_icp/core/VoxelHashMap.hpp
 tsl/robin_map.h
 -
 Eigen/Core
@@ -28,7 +28,7 @@ sophus/se3.hpp
 vector
 -
 
-/home/max/master_thesis_ros/catkin_ws/src/kiss-icp/cpp/kiss_icp/pipeline/KissICP.hpp
+/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/kiss-icp/cpp/kiss_icp/pipeline/KissICP.hpp
 Eigen/Core
 -
 tuple
@@ -36,13 +36,13 @@ tuple
 vector
 -
 kiss_icp/core/Deskew.hpp
-/home/max/master_thesis_ros/catkin_ws/src/kiss-icp/cpp/kiss_icp/pipeline/kiss_icp/core/Deskew.hpp
+/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/kiss-icp/cpp/kiss_icp/pipeline/kiss_icp/core/Deskew.hpp
 kiss_icp/core/Threshold.hpp
-/home/max/master_thesis_ros/catkin_ws/src/kiss-icp/cpp/kiss_icp/pipeline/kiss_icp/core/Threshold.hpp
+/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/kiss-icp/cpp/kiss_icp/pipeline/kiss_icp/core/Threshold.hpp
 kiss_icp/core/VoxelHashMap.hpp
-/home/max/master_thesis_ros/catkin_ws/src/kiss-icp/cpp/kiss_icp/pipeline/kiss_icp/core/VoxelHashMap.hpp
+/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/kiss-icp/cpp/kiss_icp/pipeline/kiss_icp/core/VoxelHashMap.hpp
 
-/home/max/master_thesis_ros/catkin_ws/src/kiss-icp/ros/ros1/OdometryServer.cpp
+/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/kiss-icp/ros/ros1/OdometryServer.cpp
 Eigen/Core
 -
 memory
@@ -52,45 +52,45 @@ utility
 vector
 -
 OdometryServer.hpp
-/home/max/master_thesis_ros/catkin_ws/src/kiss-icp/ros/ros1/OdometryServer.hpp
+/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/kiss-icp/ros/ros1/OdometryServer.hpp
 Utils.hpp
-/home/max/master_thesis_ros/catkin_ws/src/kiss-icp/ros/ros1/Utils.hpp
+/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/kiss-icp/ros/ros1/Utils.hpp
 kiss_icp/pipeline/KissICP.hpp
-/home/max/master_thesis_ros/catkin_ws/src/kiss-icp/ros/ros1/kiss_icp/pipeline/KissICP.hpp
+/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/kiss-icp/ros/ros1/kiss_icp/pipeline/KissICP.hpp
 geometry_msgs/PoseStamped.h
-/home/max/master_thesis_ros/catkin_ws/src/kiss-icp/ros/ros1/geometry_msgs/PoseStamped.h
+-
 geometry_msgs/TransformStamped.h
-/home/max/master_thesis_ros/catkin_ws/src/kiss-icp/ros/ros1/geometry_msgs/TransformStamped.h
+-
 nav_msgs/Odometry.h
-/home/max/master_thesis_ros/catkin_ws/src/kiss-icp/ros/ros1/nav_msgs/Odometry.h
+-
 nav_msgs/Path.h
-/home/max/master_thesis_ros/catkin_ws/src/kiss-icp/ros/ros1/nav_msgs/Path.h
+-
 ros/init.h
-/home/max/master_thesis_ros/catkin_ws/src/kiss-icp/ros/ros1/ros/init.h
+-
 ros/node_handle.h
-/home/max/master_thesis_ros/catkin_ws/src/kiss-icp/ros/ros1/ros/node_handle.h
+-
 ros/ros.h
-/home/max/master_thesis_ros/catkin_ws/src/kiss-icp/ros/ros1/ros/ros.h
+-
 sensor_msgs/PointCloud2.h
-/home/max/master_thesis_ros/catkin_ws/src/kiss-icp/ros/ros1/sensor_msgs/PointCloud2.h
+-
 tf2_ros/static_transform_broadcaster.h
-/home/max/master_thesis_ros/catkin_ws/src/kiss-icp/ros/ros1/tf2_ros/static_transform_broadcaster.h
+-
 tf2_ros/transform_broadcaster.h
-/home/max/master_thesis_ros/catkin_ws/src/kiss-icp/ros/ros1/tf2_ros/transform_broadcaster.h
+-
 
-/home/max/master_thesis_ros/catkin_ws/src/kiss-icp/ros/ros1/OdometryServer.hpp
+/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/kiss-icp/ros/ros1/OdometryServer.hpp
 kiss_icp/pipeline/KissICP.hpp
-/home/max/master_thesis_ros/catkin_ws/src/kiss-icp/ros/ros1/kiss_icp/pipeline/KissICP.hpp
+/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/kiss-icp/ros/ros1/kiss_icp/pipeline/KissICP.hpp
 nav_msgs/Path.h
-/home/max/master_thesis_ros/catkin_ws/src/kiss-icp/ros/ros1/nav_msgs/Path.h
+-
 ros/ros.h
-/home/max/master_thesis_ros/catkin_ws/src/kiss-icp/ros/ros1/ros/ros.h
+-
 sensor_msgs/PointCloud2.h
-/home/max/master_thesis_ros/catkin_ws/src/kiss-icp/ros/ros1/sensor_msgs/PointCloud2.h
+-
 tf2_ros/transform_broadcaster.h
-/home/max/master_thesis_ros/catkin_ws/src/kiss-icp/ros/ros1/tf2_ros/transform_broadcaster.h
+-
 
-/home/max/master_thesis_ros/catkin_ws/src/kiss-icp/ros/ros1/Utils.hpp
+/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/kiss-icp/ros/ros1/Utils.hpp
 Eigen/Core
 -
 algorithm
@@ -106,9 +106,9 @@ string
 vector
 -
 sensor_msgs/PointCloud2.h
-/home/max/master_thesis_ros/catkin_ws/src/kiss-icp/ros/ros1/sensor_msgs/PointCloud2.h
+-
 sensor_msgs/point_cloud2_iterator.h
-/home/max/master_thesis_ros/catkin_ws/src/kiss-icp/ros/ros1/sensor_msgs/point_cloud2_iterator.h
+-
 
 /opt/ros/noetic/include/geometry_msgs/Point.h
 string

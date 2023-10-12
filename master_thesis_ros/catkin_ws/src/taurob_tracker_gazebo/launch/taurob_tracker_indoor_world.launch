@@ -2,7 +2,7 @@
 <launch>
   <env name="GAZEBO_MODEL_PATH" value="$(find taurob_tracker_gazebo)/worlds/models"/>
   <arg name="world_name2" default="$(find taurob_tracker_gazebo)/worlds/Indoor_Worlds/fhtw.world"/>
-  <arg name="gpu" default="false"/>
+  <arg name="gpu" default="true"/>
 
   <arg name="x_pos"   default="0"/>
   <arg name="y_pos"   default="8"/>

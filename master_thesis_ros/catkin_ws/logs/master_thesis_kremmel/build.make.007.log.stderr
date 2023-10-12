@@ -1,0 +1,11 @@
+[01m[K/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel/src/ekfSlam.cpp:[m[K In function ‘[01m[Kint main(int, char**)[m[K’:
+[01m[K/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel/src/ekfSlam.cpp:464:31:[m[K [01;31m[Kerror: [m[Kno matching function for call to ‘[01m[KEKFSlam::predict()[m[K’
+  464 |         EKFSlamObject.predict([01;31m[K)[m[K;
+      |                               [01;31m[K^[m[K
+[01m[K/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel/src/ekfSlam.cpp:113:10:[m[K [01;36m[Knote: [m[Kcandidate: ‘[01m[Kvoid EKFSlam::predict(const OdometryConstPtr&, const PointCloud2ConstPtr&)[m[K’
+  113 |     void [01;36m[Kpredict[m[K(const nav_msgs::OdometryConstPtr &new_odom_msg, const sensor_msgs::PointCloud2ConstPtr &new_laserscan_msg)
+      |          [01;36m[K^~~~~~~[m[K
+[01m[K/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel/src/ekfSlam.cpp:113:10:[m[K [01;36m[Knote: [m[K  candidate expects 2 arguments, 0 provided
+make[2]: *** [CMakeFiles/EKFSlam.dir/build.make:63: CMakeFiles/EKFSlam.dir/src/ekfSlam.cpp.o] Fehler 1
+make[1]: *** [CMakeFiles/Makefile2:280: CMakeFiles/EKFSlam.dir/all] Fehler 2
+make: *** [Makefile:141: all] Fehler 2

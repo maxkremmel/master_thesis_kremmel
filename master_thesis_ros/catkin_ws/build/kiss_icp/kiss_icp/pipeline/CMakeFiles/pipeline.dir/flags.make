@@ -6,5 +6,5 @@ CXX_FLAGS = -O3 -DNDEBUG -fPIC   -fdiagnostics-color=always -Werror -Wall -Wextr
 
 CXX_DEFINES = -DSOPHUS_USE_BASIC_LOGGING=1
 
-CXX_INCLUDES = -I/home/max/master_thesis_ros/catkin_ws/src/kiss-icp/cpp/kiss_icp/pipeline -I/home/max/master_thesis_ros/catkin_ws/src/kiss-icp/cpp -I/home/max/master_thesis_ros/catkin_ws/build/kiss_icp/_deps/tessil-src/include -I/home/max/master_thesis_ros/catkin_ws/build/kiss_icp/_deps/sophus-src -isystem /usr/include/eigen3 
+CXX_INCLUDES = -I/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/kiss-icp/cpp/kiss_icp/pipeline -I/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/kiss-icp/cpp -I/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/build/kiss_icp/_deps/tessil-src/include -I/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/build/kiss_icp/_deps/sophus-src -isystem /usr/include/eigen3 
 

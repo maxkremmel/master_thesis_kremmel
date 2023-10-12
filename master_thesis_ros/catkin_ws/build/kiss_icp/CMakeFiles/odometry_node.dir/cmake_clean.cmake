@@ -1,6 +1,6 @@
 file(REMOVE_RECURSE
-  "/home/max/master_thesis_ros/catkin_ws/devel/.private/kiss_icp/lib/kiss_icp/odometry_node"
-  "/home/max/master_thesis_ros/catkin_ws/devel/.private/kiss_icp/lib/kiss_icp/odometry_node.pdb"
+  "/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/.private/kiss_icp/lib/kiss_icp/odometry_node"
+  "/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/.private/kiss_icp/lib/kiss_icp/odometry_node.pdb"
   "CMakeFiles/odometry_node.dir/ros1/OdometryServer.cpp.o"
 )
 

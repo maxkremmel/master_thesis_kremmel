@@ -1,7 +1,7 @@
 # Make file names absolute:
 #
-get_filename_component(filename "/home/max/master_thesis_ros/catkin_ws/build/kiss_icp/_deps/tessil-subbuild/tessil-populate-prefix/src/v1.2.1.tar.gz" ABSOLUTE)
-get_filename_component(directory "/home/max/master_thesis_ros/catkin_ws/build/kiss_icp/_deps/tessil-src" ABSOLUTE)
+get_filename_component(filename "/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/build/kiss_icp/_deps/tessil-subbuild/tessil-populate-prefix/src/v1.2.1.tar.gz" ABSOLUTE)
+get_filename_component(directory "/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/build/kiss_icp/_deps/tessil-src" ABSOLUTE)
 
 message(STATUS "extracting...
      src='${filename}'

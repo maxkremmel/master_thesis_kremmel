@@ -6,5 +6,5 @@ CXX_FLAGS = -O3 -DNDEBUG -fPIC   -fdiagnostics-color=always -Werror -Wall -Wextr
 
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/max/master_thesis_ros/catkin_ws/src/kiss-icp/cpp/kiss_icp/metrics -I/home/max/master_thesis_ros/catkin_ws/src/kiss-icp/cpp -isystem /usr/include/eigen3 
+CXX_INCLUDES = -I/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/kiss-icp/cpp/kiss_icp/metrics -I/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/kiss-icp/cpp -isystem /usr/include/eigen3 
 

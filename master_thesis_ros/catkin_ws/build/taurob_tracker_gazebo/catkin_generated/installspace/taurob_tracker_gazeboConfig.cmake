@@ -67,14 +67,14 @@ set(taurob_tracker_gazebo_CONFIG_INCLUDED TRUE)
 
 # set variables for source/devel/install prefixes
 if("FALSE" STREQUAL "TRUE")
-  set(taurob_tracker_gazebo_SOURCE_PREFIX /home/max/master_thesis_ros/catkin_ws/src/taurob_tracker_gazebo)
-  set(taurob_tracker_gazebo_DEVEL_PREFIX /home/max/master_thesis_ros/catkin_ws/devel/.private/taurob_tracker_gazebo)
+  set(taurob_tracker_gazebo_SOURCE_PREFIX /home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/taurob_tracker_gazebo)
+  set(taurob_tracker_gazebo_DEVEL_PREFIX /home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/.private/taurob_tracker_gazebo)
   set(taurob_tracker_gazebo_INSTALL_PREFIX "")
   set(taurob_tracker_gazebo_PREFIX ${taurob_tracker_gazebo_DEVEL_PREFIX})
 else()
   set(taurob_tracker_gazebo_SOURCE_PREFIX "")
   set(taurob_tracker_gazebo_DEVEL_PREFIX "")
-  set(taurob_tracker_gazebo_INSTALL_PREFIX /home/max/master_thesis_ros/catkin_ws/install)
+  set(taurob_tracker_gazebo_INSTALL_PREFIX /home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/install)
   set(taurob_tracker_gazebo_PREFIX ${taurob_tracker_gazebo_INSTALL_PREFIX})
 endif()
 
@@ -154,7 +154,7 @@ foreach(library ${libraries})
     set(lib_path "")
     set(lib "${library}-NOTFOUND")
     # since the path where the library is found is returned we have to iterate over the paths manually
-    foreach(path /home/max/master_thesis_ros/catkin_ws/install/lib;/home/max/master_thesis_ros/catkin_ws/devel/lib;/opt/ros/noetic/lib)
+    foreach(path /home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/install/lib;/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/lib;/opt/ros/noetic/lib)
       find_library(lib ${library}
         PATHS ${path}
         NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)

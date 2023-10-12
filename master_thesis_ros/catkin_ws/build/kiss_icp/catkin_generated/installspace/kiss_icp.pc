@@ -1,4 +1,4 @@
-prefix=/home/max/master_thesis_ros/catkin_ws/install
+prefix=/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/install
 
 Name: kiss_icp
 Description: Description of kiss_icp

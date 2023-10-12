@@ -4,5 +4,5 @@ PROJECT_PKG_CONFIG_INCLUDE_DIRS = "".split(';') if "" != "" else []
 PROJECT_CATKIN_DEPENDS = "".replace(';', ' ')
 PKG_CONFIG_LIBRARIES_WITH_PREFIX = "".split(';') if "" != "" else []
 PROJECT_NAME = "taurob_tracker_control"
-PROJECT_SPACE_DIR = "/home/max/master_thesis_ros/catkin_ws/devel/.private/taurob_tracker_control"
+PROJECT_SPACE_DIR = "/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/.private/taurob_tracker_control"
 PROJECT_VERSION = "0.0.0"

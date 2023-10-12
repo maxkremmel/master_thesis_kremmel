@@ -1,0 +1,10 @@
+[01m[K/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel/src/ekfSlam.cpp:[m[K In member function ‘[01m[Kvoid EKFSlam::predict(const OdometryConstPtr&, const PointCloud2ConstPtr&)[m[K’:
+[01m[K/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel/src/ekfSlam.cpp:149:35:[m[K [01;31m[Kerror: [m[Kexpected ‘[01m[K;[m[K’ before ‘[01m[K}[m[K’ token
+  149 |         sendNewBaseLinkTransform()
+      |                                   [01;31m[K^[m[K
+      |                                   [32m[K;[m[K
+  150 |     [32m[K}[m[K
+      |     [32m[K~[m[K                              
+make[2]: *** [CMakeFiles/EKFSlam.dir/build.make:63: CMakeFiles/EKFSlam.dir/src/ekfSlam.cpp.o] Fehler 1
+make[1]: *** [CMakeFiles/Makefile2:280: CMakeFiles/EKFSlam.dir/all] Fehler 2
+make: *** [Makefile:141: all] Fehler 2

@@ -1,7 +1,7 @@
 # generated from genmsg/cmake/pkg-genmsg.context.in
 
 messages_str = ""
-services_str = "/home/max/master_thesis_ros/catkin_ws/src/file_server/srv/GetBinaryFile.srv;/home/max/master_thesis_ros/catkin_ws/src/file_server/srv/SaveBinaryFile.srv"
+services_str = "/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/file_server/srv/GetBinaryFile.srv;/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/file_server/srv/SaveBinaryFile.srv"
 pkg_name = "file_server"
 dependencies_str = "std_msgs"
 langs = "gencpp;geneus;genlisp;gennodejs;genpy"

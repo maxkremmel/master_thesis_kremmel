@@ -12,8 +12,8 @@ project(tessil-populate NONE)
 include(ExternalProject)
 ExternalProject_Add(tessil-populate
                      "UPDATE_DISCONNECTED" "False" "SYSTEM" "URL" "https://github.com/Tessil/robin-map/archive/refs/tags/v1.2.1.tar.gz"
-                    SOURCE_DIR          "/home/max/master_thesis_ros/catkin_ws/build/kiss_icp/_deps/tessil-src"
-                    BINARY_DIR          "/home/max/master_thesis_ros/catkin_ws/build/kiss_icp/_deps/tessil-build"
+                    SOURCE_DIR          "/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/build/kiss_icp/_deps/tessil-src"
+                    BINARY_DIR          "/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/build/kiss_icp/_deps/tessil-build"
                     CONFIGURE_COMMAND   ""
                     BUILD_COMMAND       ""
                     INSTALL_COMMAND     ""

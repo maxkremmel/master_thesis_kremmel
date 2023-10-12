@@ -76,7 +76,8 @@
         "forward_list": "cpp",
         "core": "cpp",
         "dense": "cpp",
-        "numericaldiff": "cpp"
+        "numericaldiff": "cpp",
+        "filesystem": "cpp"
     },
     "cmake.sourceDirectory": "/home/max/master_thesis_ros/catkin_ws/src/master_thesis_kremmel",
     "python.autoComplete.extraPaths": [
@@ -87,5 +88,6 @@
         "/home/max/master_thesis_ros/catkin_ws/devel/lib/python3/dist-packages",
         "/opt/ros/noetic/lib/python3/dist-packages"
     ],
-    "C_Cpp.default.compilerPath": "/usr/bin/gcc"
+    "C_Cpp.default.compilerPath": "/usr/bin/gcc",
+    "ros.distro": "noetic"
 }

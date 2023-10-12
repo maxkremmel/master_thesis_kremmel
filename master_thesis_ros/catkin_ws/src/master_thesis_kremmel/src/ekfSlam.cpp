@@ -4,6 +4,7 @@
 #include <sensor_msgs/Imu.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <nav_msgs/Odometry.h>
+#include <tf/transform_broadcaster.h>
 #include <tf2_ros/transform_listener.h>
 #include <tf2_eigen/tf2_eigen.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
@@ -14,8 +15,6 @@
 #include <pcl/point_types.h>
 #include <pcl/registration/icp.h>
 #include <pcl_conversions/pcl_conversions.h>
-#include <pcl/visualization/pcl_visualizer.h>
-#include <pcl/visualization/cloud_viewer.h>
 #include <Eigen/Dense>
 #include "json.hpp"
 
@@ -28,21 +27,16 @@ class EKFSlam
 public:
     EKFSlam(ros::NodeHandle &nTemp) : n(nTemp)
     {
-        curentPoseSubcriber.subscribe(n, "/odometry_node/odometry", 10);
+        curentPoseSubcriber.subscribe(n, "/odom", 10);
         laserScanSubscriber.subscribe(n, "/transformed_laserscan", 10);
 
         covEllipseMsgPublisher = n.advertise<visualization_msgs::Marker>("/ekf_slam/current_state_marker", 1);
         currentStatePublisher = n.advertise<nav_msgs::Odometry>("/ekf_slam/current_state", 1);
-        predictionStatePublisher = n.advertise<nav_msgs::Odometry>("/ekf_slam/prediction_state", 1);
 
         sync.reset(new Sync(SyncRule(10), curentPoseSubcriber, laserScanSubscriber));
         sync->registerCallback(boost::bind(&EKFSlam::predict, this, _1, _2));
         listener = new tf2_ros::TransformListener(tfBuffer); // TransformListener mit Buffer initialisieren
-        // PCL Viewer initialisieren
-        pcl::PointCloud<pcl::PointXYZ>::Ptr emptyCloud_ptr(new pcl::PointCloud<pcl::PointXYZ>);
-        viewer = createViewer(emptyCloud_ptr);
         // Initialisierung des EKF
-
         EPS = 1e-4;
         int NUM_LM = 20;          // Maximale Anzahl der LM's auf 20 gesetzt
         DIMsize = 3 + 2 * NUM_LM; // Dimension der Jakobimatrizen und der Covarianzmatrizen
@@ -75,23 +69,29 @@ public:
         jsonPath = packagePath + "/data/stored_landmarks.json";
 
         ros::Duration(2).sleep(); // Warten bis rviz geladen ist
+
+        transformStamped.header.frame_id = "odom";
+        transformStamped.child_frame_id = "base_link";
     }
 
-    void predict(const nav_msgs::OdometryConstPtr &new_pose_msg, const sensor_msgs::PointCloud2ConstPtr &new_laserscan_msg)
+    void predict(const nav_msgs::OdometryConstPtr &new_odom_msg, const sensor_msgs::PointCloud2ConstPtr &new_laserscan_msg)
     {
-        double dt = ros::Time::now().toSec() - last_timestamp; // Zeitspanne seit letztem Funktionsaufruf berechnen
-        last_timestamp = ros::Time::now().toSec();
-
+        double dt = new_odom_msg->header.stamp.toSec() - last_timestamp; // Zeitspanne seit letztem Funktionsaufruf berechnen
+        last_timestamp = new_odom_msg->header.stamp.toSec();
+        
         double theta = state_vector_last(2);
 
-        state_vector.head(3) << new_pose_msg->pose.pose.position.x, new_pose_msg->pose.pose.position.y, getYaw(new_pose_msg); // aktuelle Pose -> berechnet von KISS-ICP
+        state_vector.head(3) << new_odom_msg->pose.pose.position.x, new_odom_msg->pose.pose.position.y, getYaw(new_odom_msg); // aktuelle Pose -> berechnet von KISS-ICP
 
-        Eigen::MatrixXd G;                                                        // Jakobi des Bewegungsmodells
+        Eigen::MatrixXd G; // Jakobi des Bewegungsmodells
         G.resize(DIMsize, DIMsize);
         G.setIdentity();
         Eigen::MatrixXd V;
         V.resize(3, 2);
         Eigen::Matrix2d M;
+ 
+        /* double v = new_odom_msg->twist.twist.linear.x;
+        double w = new_odom_msg->twist.twist.angular.z; */
 
         // Zur berechung der Jakobi (G) aus aktueller Pose und letzter Pose Geschwindigkeiten berechnen
         Eigen::Vector3d vel3d(3);
@@ -104,6 +104,10 @@ public:
 
         if (abs(w) > EPS) // Verhindern von Division durch 0
         {
+            /* state_vector(0) += -v / w * sin(theta) + v / w * sin(theta + w * dt);
+            state_vector(1) += +v / w * cos(theta) - v / w * cos(theta + w * dt);
+            state_vector(2) += w * dt; */
+
             G.block(0, 0, 3, 3) << 1, 0, -(v / w) * cos(theta) + (v / w) * cos(theta + w * dt),
                 0, 1, -(v / w) * sin(theta) + (v / w) * sin(theta + w * dt),
                 0, 0, 1;
@@ -113,6 +117,10 @@ public:
         }
         else
         {
+            state_vector(0) += cos(theta) * v * dt;
+            state_vector(1) += sin(theta) * v * dt;
+            state_vector(2) += w * dt;
+
             // D'Hospital Regel angewendet um numerische Fehler (Division durch Null)
             G.block(0, 0, 3, 3) << 1, 0, -v * sin(theta) * dt,
                 0, 1, v * cos(theta) * dt,
@@ -129,8 +137,8 @@ public:
 
         state_vector_last = state_vector; // Aktuellen Zustandsvektor in state_vector_last zwischenspeichern
 
-        viewer->spinOnce();
         publishEllipses();
+        sendNewBaseLinkTransform();
     }
 
     void correct(const sensor_msgs::PointCloud2ConstPtr &new_laserscan_msg)
@@ -140,8 +148,6 @@ public:
 
         pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_laserscan(new pcl::PointCloud<pcl::PointXYZ>);
         pcl::fromROSMsg(*new_laserscan_msg, *pcl_laserscan);
-
-        viewer->updatePointCloud(pcl_laserscan, "Laser");
 
         pcl::PointCloud<pcl::PointXYZ>::Ptr convergedLandmarks(new pcl::PointCloud<pcl::PointXYZ>);
         // for-Schleife durch alle gespeicherten LM's
@@ -164,6 +170,7 @@ public:
             // If stored LM is closer than 5 m...
             if (sqrt(pow(delta(0), 2) + pow(delta(1), 2)) < 5)
             {
+                std::cout << "Landmark: " << i << " in reach ";
                 double q = delta.transpose() * delta; // Euklidische Distanz
                 Eigen::Vector2d predictedMeasurment;
                 predictedMeasurment(0) = sqrt(q);
@@ -185,22 +192,19 @@ public:
                 Eigen::Vector2d actualMeasurement = searchLMmatches(pcl_laserscan, it.value()["points"], it.value()["pose"], convergedLandmarks, cov_index);
                 if (actualMeasurement(0) != -1)
                 {
+                    std::cout << "... therefore good enough for correction." << std::endl;
                     state_vector = state_vector + K * (actualMeasurement - predictedMeasurment); // state_vektor updaten
                     Cov = (MatrixXd::Identity(Cov.rows(), Cov.rows()) - K * H_i) * Cov;          // Cov updaten
                 }
                 else
                 {
+                    std::cout << "... therefore NOT good enough for correction." << std::endl;
                     // skip the update step
                 }
             }
             i++;
         }
         numberOfStoredLandmarks = i;
-        // viewer->updatePointCloud(pcl_landmark_target, "Landmark");
-        viewer->removePointCloud("Landmark");
-        viewer->addPointCloud(convergedLandmarks, "Landmark");
-        viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 5, "Landmark");
-        viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 0, 1, 0, "Landmark");
     }
 
     Eigen::Vector2d searchLMmatches(pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_laserscan, json points, json pose, pcl::PointCloud<pcl::PointXYZ>::Ptr convergedLandmarks, int cov_index)
@@ -221,6 +225,8 @@ public:
         // ToDo: statt punktwolke zu verschieben Initial guess bei icp.align() angeben
         geometry_msgs::TransformStamped transform = tfBuffer.lookupTransform("base_link", "odom", ros::Time(0), ros::Duration(1.5));
         pcl::transformPointCloud(*pcl_landmark_target, *pcl_landmark_target, tf2::transformToEigen(transform).matrix());
+
+        *convergedLandmarks += *pcl_landmark_target;
         // The Iterative Closest Point algorithm
         // ToDo: Fine tunen
         // ToDo: Kann die PCL den Coherent Point Drift (CPD) Algorithmus???? (https://github.com/gadomski/cpd)
@@ -232,6 +238,9 @@ public:
 
         double fitnessScore = icp.getFitnessScore();
         Eigen::Vector2d actualMeasurement;
+
+        std::cout << " fitness score: " << fitnessScore << std::endl;
+
         if (fitnessScore < 0.01)
         {
             Eigen::Matrix4f transformation = icp.getFinalTransformation();
@@ -253,7 +262,7 @@ public:
             actualMeasurement(0) = sqrt(q);
             actualMeasurement(1) = constrain_angle(atan2(delta_actual(1), delta_actual(0) - state_vector(3)));
 
-            *convergedLandmarks += *pcl_landmark_target;
+            
         }
         else
         {
@@ -285,8 +294,14 @@ public:
             odomMsg->pose.pose.orientation.w);
         tf2::Matrix3x3 m(q);
         m.getRPY(roll, pitch, yaw);
-
         return yaw;
+    }
+
+    tf2::Quaternion getQuat(double theta)
+    {
+        tf2::Quaternion quat;
+        quat.setRPY(0, 0, theta);
+        return quat;
     }
 
     void publishEllipses()
@@ -341,8 +356,7 @@ public:
     void publishBelieve(double x, double y, double theta, double minor, double major, std::string ellipseName, int id = 0)
     {
         //  state_vektor und Cov in Odometry Message verpacken und publishen
-        tf2::Quaternion quat;
-        quat.setRPY(0, 0, theta);
+        tf2::Quaternion quat = getQuat(theta);
         geometry_msgs::Pose ellipsePose;
         ellipsePose.position.x = x;
         ellipsePose.position.y = y;
@@ -356,7 +370,6 @@ public:
             currentStateMsg.child_frame_id = "base_link";
             currentStateMsg.header.frame_id = "odom";
             currentStateMsg.header.stamp = ros::Time::now();
-
             currentStatePublisher.publish(currentStateMsg);
         }
 
@@ -378,32 +391,27 @@ public:
         covEllipseMsg.color.b = 1.0f;
         covEllipseMsg.color.a = 0.5;
         covEllipseMsg.lifetime = ros::Duration();
-
         covEllipseMsgPublisher.publish(covEllipseMsg);
     }
 
-    pcl::visualization::PCLVisualizer::Ptr createViewer(pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloud)
+    void sendNewBaseLinkTransform()
     {
-        // -----         Open 3D viewer           -----
-        pcl::visualization::PCLVisualizer::Ptr viewer(new pcl::visualization::PCLVisualizer("Landmark Viewer"));
-        viewer->setBackgroundColor(0.05, 0.05, 0.05);
-        viewer->addCoordinateSystem(1.0);
-        viewer->initCameraParameters();
+        tf2::Quaternion quat = getQuat(state_vector(2));
+        transformStamped.header.stamp = ros::Time::now();
+        transformStamped.transform.translation.x = state_vector(0);
+        transformStamped.transform.translation.y = state_vector(1);
+        transformStamped.transform.translation.z = 0;
+        transformStamped.transform.rotation = tf2::toMsg(quat);
 
-        // Add laser point cloud dummy and ncrease point size and set color of Laser Cloud
-        viewer->addPointCloud(cloud, "Laser");
-        viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 5, "Laser");
-        viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 1, 0, 0, "Laser");
-        viewer->setCameraPosition(5.7, 12, 10.6, -0.27, -0.47, 0.84, 0);
-        viewer->setSize(1920, 1080); // Visualiser window size
-        return (viewer);
+        br.sendTransform(transformStamped);
     }
+
+  
 
 private:
     ros::NodeHandle n;
     ros::Publisher covEllipseMsgPublisher;
     ros::Publisher currentStatePublisher;
-    ros::Publisher predictionStatePublisher;
 
     message_filters::Subscriber<sensor_msgs::PointCloud2> laserScanSubscriber;
     message_filters::Subscriber<nav_msgs::Odometry> curentPoseSubcriber;
@@ -428,11 +436,11 @@ private:
 
     Eigen::Matrix2d Q;
 
-    pcl::visualization::PCLVisualizer::Ptr viewer;
-    ros::Timer viewer_timer;
-
     tf2_ros::Buffer tfBuffer;
     tf2_ros::TransformListener *listener;
+
+    tf::TransformBroadcaster br;
+    geometry_msgs::TransformStamped transformStamped;
 };
 
 int main(int argc, char **argv)

@@ -7,7 +7,7 @@
 # new environment variables
 
 # modified environment variables
-export CMAKE_PREFIX_PATH="/home/max/master_thesis_ros/catkin_ws/devel/.private/taurob_tracker_description:$CMAKE_PREFIX_PATH"
-export PWD='/home/max/master_thesis_ros/catkin_ws/build/taurob_tracker_description'
-export ROSLISP_PACKAGE_DIRECTORIES="/home/max/master_thesis_ros/catkin_ws/devel/.private/taurob_tracker_description/share/common-lisp:$ROSLISP_PACKAGE_DIRECTORIES"
-export ROS_PACKAGE_PATH="/home/max/master_thesis_ros/catkin_ws/src/taurob_tracker_description:$ROS_PACKAGE_PATH"
+export CMAKE_PREFIX_PATH="/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/.private/taurob_tracker_description:$CMAKE_PREFIX_PATH"
+export PWD='/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/build/taurob_tracker_description'
+export ROSLISP_PACKAGE_DIRECTORIES="/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/.private/taurob_tracker_description/share/common-lisp:$ROSLISP_PACKAGE_DIRECTORIES"
+export ROS_PACKAGE_PATH="/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/taurob_tracker_description:$ROS_PACKAGE_PATH"

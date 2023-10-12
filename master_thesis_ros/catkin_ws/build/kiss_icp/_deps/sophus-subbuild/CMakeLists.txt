@@ -12,8 +12,8 @@ project(sophus-populate NONE)
 include(ExternalProject)
 ExternalProject_Add(sophus-populate
                      "UPDATE_DISCONNECTED" "False" "SYSTEM" "URL" "https://github.com/nachovizzo/Sophus/archive/refs/tags/1.22.11.tar.gz"
-                    SOURCE_DIR          "/home/max/master_thesis_ros/catkin_ws/build/kiss_icp/_deps/sophus-src"
-                    BINARY_DIR          "/home/max/master_thesis_ros/catkin_ws/build/kiss_icp/_deps/sophus-build"
+                    SOURCE_DIR          "/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/build/kiss_icp/_deps/sophus-src"
+                    BINARY_DIR          "/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/build/kiss_icp/_deps/sophus-build"
                     CONFIGURE_COMMAND   ""
                     BUILD_COMMAND       ""
                     INSTALL_COMMAND     ""

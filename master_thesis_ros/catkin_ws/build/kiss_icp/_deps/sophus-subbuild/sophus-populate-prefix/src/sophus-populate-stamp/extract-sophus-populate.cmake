@@ -1,7 +1,7 @@
 # Make file names absolute:
 #
-get_filename_component(filename "/home/max/master_thesis_ros/catkin_ws/build/kiss_icp/_deps/sophus-subbuild/sophus-populate-prefix/src/1.22.11.tar.gz" ABSOLUTE)
-get_filename_component(directory "/home/max/master_thesis_ros/catkin_ws/build/kiss_icp/_deps/sophus-src" ABSOLUTE)
+get_filename_component(filename "/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/build/kiss_icp/_deps/sophus-subbuild/sophus-populate-prefix/src/1.22.11.tar.gz" ABSOLUTE)
+get_filename_component(directory "/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/build/kiss_icp/_deps/sophus-src" ABSOLUTE)
 
 message(STATUS "extracting...
      src='${filename}'

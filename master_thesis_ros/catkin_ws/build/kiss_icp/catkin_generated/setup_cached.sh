@@ -7,7 +7,7 @@
 # new environment variables
 
 # modified environment variables
-export CMAKE_PREFIX_PATH="/home/max/master_thesis_ros/catkin_ws/devel/.private/kiss_icp:$CMAKE_PREFIX_PATH"
-export PWD='/home/max/master_thesis_ros/catkin_ws/build/kiss_icp'
-export ROSLISP_PACKAGE_DIRECTORIES="/home/max/master_thesis_ros/catkin_ws/devel/.private/kiss_icp/share/common-lisp:$ROSLISP_PACKAGE_DIRECTORIES"
-export ROS_PACKAGE_PATH="/home/max/master_thesis_ros/catkin_ws/src/kiss-icp/ros:$ROS_PACKAGE_PATH"
+export CMAKE_PREFIX_PATH="/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/.private/kiss_icp:$CMAKE_PREFIX_PATH"
+export PWD='/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/build/kiss_icp'
+export ROSLISP_PACKAGE_DIRECTORIES="/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/.private/kiss_icp/share/common-lisp:$ROSLISP_PACKAGE_DIRECTORIES"
+export ROS_PACKAGE_PATH="/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/kiss-icp/ros:$ROS_PACKAGE_PATH"
