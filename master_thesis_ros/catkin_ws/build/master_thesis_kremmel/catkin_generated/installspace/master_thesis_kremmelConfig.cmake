@@ -67,14 +67,14 @@ set(master_thesis_kremmel_CONFIG_INCLUDED TRUE)
 
 # set variables for source/devel/install prefixes
 if("FALSE" STREQUAL "TRUE")
-  set(master_thesis_kremmel_SOURCE_PREFIX /home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel)
-  set(master_thesis_kremmel_DEVEL_PREFIX /home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/.private/master_thesis_kremmel)
+  set(master_thesis_kremmel_SOURCE_PREFIX /home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel)
+  set(master_thesis_kremmel_DEVEL_PREFIX /home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/.private/master_thesis_kremmel)
   set(master_thesis_kremmel_INSTALL_PREFIX "")
   set(master_thesis_kremmel_PREFIX ${master_thesis_kremmel_DEVEL_PREFIX})
 else()
   set(master_thesis_kremmel_SOURCE_PREFIX "")
   set(master_thesis_kremmel_DEVEL_PREFIX "")
-  set(master_thesis_kremmel_INSTALL_PREFIX /home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/install)
+  set(master_thesis_kremmel_INSTALL_PREFIX /home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/install)
   set(master_thesis_kremmel_PREFIX ${master_thesis_kremmel_INSTALL_PREFIX})
 endif()
 
@@ -91,9 +91,9 @@ endif()
 # flag project as catkin-based to distinguish if a find_package()-ed project is a catkin project
 set(master_thesis_kremmel_FOUND_CATKIN_PROJECT TRUE)
 
-if(NOT " " STREQUAL " ")
+if(NOT "include " STREQUAL " ")
   set(master_thesis_kremmel_INCLUDE_DIRS "")
-  set(_include_dirs "")
+  set(_include_dirs "include")
   if(NOT " " STREQUAL " ")
     set(_report "Check the issue tracker '' and consider creating a ticket if the problem has not been reported yet.")
   elseif(NOT " " STREQUAL " ")
@@ -154,7 +154,7 @@ foreach(library ${libraries})
     set(lib_path "")
     set(lib "${library}-NOTFOUND")
     # since the path where the library is found is returned we have to iterate over the paths manually
-    foreach(path /home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/install/lib;/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/lib;/opt/ros/noetic/lib)
+    foreach(path /home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/install/lib;/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/lib;/opt/ros/noetic/lib)
       find_library(lib ${library}
         PATHS ${path}
         NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
@@ -177,7 +177,7 @@ foreach(library ${libraries})
   endif()
 endforeach()
 
-set(master_thesis_kremmel_EXPORTED_TARGETS "")
+set(master_thesis_kremmel_EXPORTED_TARGETS "master_thesis_kremmel_generate_messages_cpp;master_thesis_kremmel_generate_messages_eus;master_thesis_kremmel_generate_messages_lisp;master_thesis_kremmel_generate_messages_nodejs;master_thesis_kremmel_generate_messages_py")
 # create dummy targets for exported code generation targets to make life of users easier
 foreach(t ${master_thesis_kremmel_EXPORTED_TARGETS})
   if(NOT TARGET ${t})
@@ -214,7 +214,7 @@ foreach(depend ${depends})
   _list_append_deduplicate(master_thesis_kremmel_EXPORTED_TARGETS ${${master_thesis_kremmel_dep}_EXPORTED_TARGETS})
 endforeach()
 
-set(pkg_cfg_extras "")
+set(pkg_cfg_extras "master_thesis_kremmel-msg-extras.cmake")
 foreach(extra ${pkg_cfg_extras})
   if(NOT IS_ABSOLUTE ${extra})
     set(extra ${master_thesis_kremmel_DIR}/${extra})

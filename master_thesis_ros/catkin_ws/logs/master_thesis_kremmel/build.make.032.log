@@ -1,8 +1,0 @@
-[35m[1mScanning dependencies of target EKFSlam[0m
-[ 20%] Built target Evaluator
-[ 40%] Built target PredictionTest
-[ 60%] Built target TransformLaserScan
-[ 80%] Built target LandmarkProcessor
-[ 90%] [32mBuilding CXX object CMakeFiles/EKFSlam.dir/src/ekfSlam.cpp.o[0m
-[100%] [32m[1mLinking CXX executable /home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/.private/master_thesis_kremmel/lib/master_thesis_kremmel/EKFSlam[0m
-[100%] Built target EKFSlam

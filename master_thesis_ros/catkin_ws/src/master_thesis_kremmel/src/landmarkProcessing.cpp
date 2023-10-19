@@ -12,6 +12,7 @@
 #include <iostream>
 #include <fstream>
 #include "json.hpp"
+#include <master_thesis_kremmel/Landmark.h>
 
 using namespace std::chrono_literals;
 using json = nlohmann::json;
@@ -22,10 +23,8 @@ public:
     NewLandMarkProcessing(ros::NodeHandle &nTemp) : n(nTemp)
     {
         LMsubscriber = n.subscribe<sensor_msgs::PointCloud2>("/new_landmark", 10, &NewLandMarkProcessing::newLandMarkCallback, this);
-        LMpublisher = n.advertise<sensor_msgs::PointCloud2>("/stored_landmarks", 1000);
-        /* viewer_timer = n.createTimer(ros::Duration(0.1), &NewLandMarkProcessing::timerCB, this);
-        pcl::PointCloud<pcl::PointXYZ>::Ptr emptyCloud_ptr(new pcl::PointCloud<pcl::PointXYZ>);
-        viewer = createViewer(emptyCloud_ptr); */
+
+        sendNewLMclient = n.serviceClient<master_thesis_kremmel::Landmark>("newLMservice");
 
         // LM's aus JSON Datei einlesen
         std::string packagePath = ros::package::getPath("master_thesis_kremmel");
@@ -82,7 +81,6 @@ public:
             *iterZ = it.value().at(2);
         }
         landmark.header.stamp = ros::Time::now();
-        LMpublisher.publish(landmark);
     }
 
     void newLandMarkCallback(const sensor_msgs::PointCloud2ConstPtr &input)
@@ -90,26 +88,23 @@ public:
         ROS_INFO("++++++++++++++++++   Got new LandMark   +++++++++++++++++");
         pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_cloud(new pcl::PointCloud<pcl::PointXYZ>);
         pcl::fromROSMsg(*input, *pcl_cloud);
-        /* viewer->updatePointCloud<pcl::PointXYZ>(pcl_cloud, "Landmark"); */
-
         // Downsample of LM Pointcloud:
-        pcl::VoxelGrid<pcl::PointXYZ> sor;
+        /* pcl::VoxelGrid<pcl::PointXYZ> sor;
         sor.setInputCloud(pcl_cloud);
         sor.setLeafSize(0.1f, 0.1f, 0.1f);
-        sor.filter(*pcl_cloud);
-
+        sor.filter(*pcl_cloud); */
         // Store LM:
         // Calculate Pose of LM using mean of XYZ coordinates off all poits
         float x_mean = 0;
         float y_mean = 0;
         float z_mean = 0;
         json lm_pointcloud;
-
         for (pcl::PointCloud<pcl::PointXYZ>::iterator it = pcl_cloud->begin(); it != pcl_cloud->end(); it++)
         {
             if (it->z < 0.1)
             {
                 // Skip this point because its part of the floor
+                it = pcl_cloud->erase(it); // ToDo: Funktioniert nicht
             }
             else
             {
@@ -123,11 +118,12 @@ public:
 
             // ToDo: Eventuell noch Punktwolke komprimieren
         }
-        if(lm_pointcloud.empty()){
+        if (lm_pointcloud.empty())
+        {
             std::cout << "New Landmark only consists out of floor... not storing LM" << std::endl;
             return;
         }
-        
+
         x_mean /= lm_pointcloud.size();
         y_mean /= lm_pointcloud.size();
         z_mean /= lm_pointcloud.size();
@@ -157,6 +153,30 @@ public:
                 {"points", lm_pointcloud}};
 
             stored_landmarks["landmarks"].push_back(new_landmark);
+            // send Landmark to EKF Node
+
+            master_thesis_kremmel::Landmark srv;
+            srv.request.x = x_mean;
+            srv.request.y = y_mean;
+            srv.request.z = z_mean;
+            pcl::toROSMsg(*pcl_cloud.get(), srv.request.points);
+
+            if (sendNewLMclient.call(srv))
+            {
+                if (srv.response.success)
+                {
+                    ROS_INFO("New Landmark successfully stored in data structure of EKF Slam Node");
+                }
+                else
+                {
+                    ROS_INFO("New Landmark could not be stored in data structure of EKF Slam Node");
+                }
+            }
+            else
+            {
+                ROS_ERROR("Failed to call service add_two_ints");
+            }
+
             storeNewLandmark();
             publishLandMarks(stored_landmarks);
         }
@@ -179,36 +199,13 @@ public:
         }
     }
 
-    /* void timerCB(const ros::TimerEvent &)
-    {
-        if (!viewer->wasStopped())
-        {
-            viewer->spinOnce(100);
-        }
-        else
-        {
-            ros::shutdown();
-        }
-    }
-
-    pcl::visualization::PCLVisualizer::Ptr createViewer(pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloud)
-    {
-        // -----         Open 3D viewer           -----
-        pcl::visualization::PCLVisualizer::Ptr viewer(new pcl::visualization::PCLVisualizer("Landmark Viewer"));
-        viewer->setBackgroundColor(0, 0, 0);
-        viewer->addPointCloud<pcl::PointXYZ>(cloud, "Landmark");
-        viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "Landmark");
-        viewer->addCoordinateSystem(1.0);
-        viewer->initCameraParameters();
-        return (viewer);
-    } */
-
 private:
     ros::NodeHandle n;
-    /* ros::Timer viewer_timer; */
+
     ros::Subscriber LMsubscriber;
-    ros::Publisher LMpublisher;
-    /* pcl::visualization::PCLVisualizer::Ptr viewer; */
+
+    ros::ServiceClient sendNewLMclient;
+
     std::string jsonPath;
     json stored_landmarks;
     sensor_msgs::PointCloud2 landmark;

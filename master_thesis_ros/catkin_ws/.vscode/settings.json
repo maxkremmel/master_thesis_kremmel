@@ -1,6 +1,15 @@
 {
+    "cmake.sourceDirectory": "/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel",
+    "python.autoComplete.extraPaths": [
+        "/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/lib/python3/dist-packages",
+        "/opt/ros/noetic/lib/python3/dist-packages"
+    ],
+    "python.analysis.extraPaths": [
+        "/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/lib/python3/dist-packages",
+        "/opt/ros/noetic/lib/python3/dist-packages"
+    ],
     "files.associations": {
-        "*.ipp": "cpp",
+        "ostream": "cpp",
         "cctype": "cpp",
         "clocale": "cpp",
         "cmath": "cpp",
@@ -16,10 +25,7 @@
         "any": "cpp",
         "array": "cpp",
         "atomic": "cpp",
-        "hash_map": "cpp",
-        "hash_set": "cpp",
         "strstream": "cpp",
-        "bit": "cpp",
         "*.tcc": "cpp",
         "bitset": "cpp",
         "chrono": "cpp",
@@ -28,31 +34,33 @@
         "condition_variable": "cpp",
         "cstdint": "cpp",
         "deque": "cpp",
+        "forward_list": "cpp",
         "list": "cpp",
-        "map": "cpp",
-        "set": "cpp",
         "unordered_map": "cpp",
         "unordered_set": "cpp",
         "vector": "cpp",
         "exception": "cpp",
         "algorithm": "cpp",
+        "filesystem": "cpp",
         "functional": "cpp",
         "iterator": "cpp",
+        "map": "cpp",
         "memory": "cpp",
         "memory_resource": "cpp",
         "numeric": "cpp",
         "optional": "cpp",
         "random": "cpp",
         "ratio": "cpp",
-        "regex": "cpp",
+        "set": "cpp",
         "string": "cpp",
         "string_view": "cpp",
         "system_error": "cpp",
         "tuple": "cpp",
         "type_traits": "cpp",
         "utility": "cpp",
+        "hash_map": "cpp",
+        "hash_set": "cpp",
         "fstream": "cpp",
-        "future": "cpp",
         "initializer_list": "cpp",
         "iomanip": "cpp",
         "iosfwd": "cpp",
@@ -61,7 +69,6 @@
         "limits": "cpp",
         "mutex": "cpp",
         "new": "cpp",
-        "ostream": "cpp",
         "shared_mutex": "cpp",
         "sstream": "cpp",
         "stdexcept": "cpp",
@@ -73,21 +80,6 @@
         "typeinfo": "cpp",
         "valarray": "cpp",
         "variant": "cpp",
-        "forward_list": "cpp",
-        "core": "cpp",
-        "dense": "cpp",
-        "numericaldiff": "cpp",
-        "filesystem": "cpp"
-    },
-    "cmake.sourceDirectory": "/home/max/master_thesis_ros/catkin_ws/src/master_thesis_kremmel",
-    "python.autoComplete.extraPaths": [
-        "/home/max/master_thesis_ros/catkin_ws/devel/lib/python3/dist-packages",
-        "/opt/ros/noetic/lib/python3/dist-packages"
-    ],
-    "python.analysis.extraPaths": [
-        "/home/max/master_thesis_ros/catkin_ws/devel/lib/python3/dist-packages",
-        "/opt/ros/noetic/lib/python3/dist-packages"
-    ],
-    "C_Cpp.default.compilerPath": "/usr/bin/gcc",
-    "ros.distro": "noetic"
+        "bit": "cpp"
+    }
 }

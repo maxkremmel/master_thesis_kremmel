@@ -1,0 +1,16 @@
+{
+    "configurations": [
+        {
+            "name": "ROS: Launch",
+            "request": "launch",
+            "target": "/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel/launch/launch.launch",
+            "launch": [
+                "rviz",
+                "gz",
+                "gzclient",
+                "gzserver"
+            ],
+            "type": "ros"
+        }
+    ]
+}

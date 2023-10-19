@@ -1,5 +1,0 @@
-[ 20%] Built target Evaluator
-[ 40%] Built target PredictionTest
-[ 60%] Built target TransformLaserScan
-[ 80%] Built target EKFSlam
-[100%] Built target LandmarkProcessor

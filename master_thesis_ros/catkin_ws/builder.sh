@@ -1,6 +1,6 @@
 #!/bin/sh
 
-WATCH_DIRS=(~/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel/src)
+WATCH_DIRS=(~/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel/src)
 
 inotifywait -m ${WATCH_DIRS[@]} -e close_write |
     while read path action file; do

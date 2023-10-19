@@ -18,12 +18,11 @@ public:
 
         try
         {
-            transform = tfBuffer.lookupTransform("base_link", "velodyne", ros::Time(0), ros::Duration(3.0)); // Nach Transformation suchen (Timeout von 3 Sekunden)
+            transform = tfBuffer.lookupTransform("base_footprint", "velodyne", ros::Time(0), ros::Duration(3.0)); // Nach Transformation suchen (Timeout von 3 Sekunden)
         }
         catch (tf2::TransformException &ex)
         {
             ROS_WARN("%s", ex.what());
-            ros::Duration(1.0).sleep();
         }
     }
     // Die callback Funktion transformiert jede Message des LiDAR Scanners vom velodyne Frame in den base_link Frame
