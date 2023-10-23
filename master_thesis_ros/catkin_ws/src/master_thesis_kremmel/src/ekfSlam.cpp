@@ -55,8 +55,9 @@ public:
 
         state_vector.resize(DIMsize);
         state_vector.setZero();
-        state_vector(0) = -2;
-        state_vector(2) = 3.14; // ToDo: Wenn Roboter eingeschaltet wird haben wird pose 0. Wie wird das in der Praxis umgesetzt?
+        state_vector(0) = 0;
+        state_vector(1) = 0;
+        state_vector(2) = 0; // ToDo: Wenn Roboter eingeschaltet wird haben wird pose 0. Wie wird das in der Praxis umgesetzt?
         state_vector_last.resize(DIMsize);
         state_vector_last.setZero();
 
