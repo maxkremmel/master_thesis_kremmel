@@ -67,14 +67,14 @@ set(master_thesis_kremmel_CONFIG_INCLUDED TRUE)
 
 # set variables for source/devel/install prefixes
 if("FALSE" STREQUAL "TRUE")
-  set(master_thesis_kremmel_SOURCE_PREFIX /home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel)
-  set(master_thesis_kremmel_DEVEL_PREFIX /home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/.private/master_thesis_kremmel)
+  set(master_thesis_kremmel_SOURCE_PREFIX /home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel)
+  set(master_thesis_kremmel_DEVEL_PREFIX /home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/.private/master_thesis_kremmel)
   set(master_thesis_kremmel_INSTALL_PREFIX "")
   set(master_thesis_kremmel_PREFIX ${master_thesis_kremmel_DEVEL_PREFIX})
 else()
   set(master_thesis_kremmel_SOURCE_PREFIX "")
   set(master_thesis_kremmel_DEVEL_PREFIX "")
-  set(master_thesis_kremmel_INSTALL_PREFIX /home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/install)
+  set(master_thesis_kremmel_INSTALL_PREFIX /home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/install)
   set(master_thesis_kremmel_PREFIX ${master_thesis_kremmel_INSTALL_PREFIX})
 endif()
 
@@ -154,7 +154,7 @@ foreach(library ${libraries})
     set(lib_path "")
     set(lib "${library}-NOTFOUND")
     # since the path where the library is found is returned we have to iterate over the paths manually
-    foreach(path /home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/install/lib;/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/lib;/opt/ros/noetic/lib)
+    foreach(path /home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/install/lib;/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/lib;/opt/ros/noetic/lib)
       find_library(lib ${library}
         PATHS ${path}
         NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)

@@ -1,6 +1,6 @@
 file(REMOVE_RECURSE
-  "/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/.private/file_server/lib/file_server/file_server"
-  "/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/.private/file_server/lib/file_server/file_server.pdb"
+  "/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/.private/file_server/lib/file_server/file_server"
+  "/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/.private/file_server/lib/file_server/file_server.pdb"
   "CMakeFiles/file_server.dir/src/file_server.cpp.o"
 )
 

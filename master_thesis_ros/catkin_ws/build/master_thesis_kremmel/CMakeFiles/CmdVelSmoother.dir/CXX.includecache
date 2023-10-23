@@ -6,9 +6,9 @@
 
 #IncludeRegexTransform: 
 
-/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel/src/cmdVelSmoother.cpp
+/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel/src/cmdVelSmoother.cpp
 ros/ros.h
-/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel/src/ros/ros.h
+/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel/src/ros/ros.h
 geometry_msgs/Twist.h
 -
 

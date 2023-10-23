@@ -1,1 +1,1 @@
-/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/.private/master_thesis_kremmel/share/roseus/ros/master_thesis_kremmel/manifest.l
+/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/.private/master_thesis_kremmel/share/roseus/ros/master_thesis_kremmel/manifest.l

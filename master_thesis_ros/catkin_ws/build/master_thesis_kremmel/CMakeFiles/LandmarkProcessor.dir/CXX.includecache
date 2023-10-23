@@ -6,49 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/.private/master_thesis_kremmel/include/master_thesis_kremmel/Landmark.h
-ros/service_traits.h
--
-master_thesis_kremmel/LandmarkRequest.h
--
-master_thesis_kremmel/LandmarkResponse.h
--
-
-/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/.private/master_thesis_kremmel/include/master_thesis_kremmel/LandmarkRequest.h
-string
--
-vector
--
-memory
--
-ros/types.h
--
-ros/serialization.h
--
-ros/builtin_message_traits.h
--
-ros/message_operations.h
--
-sensor_msgs/PointCloud2.h
--
-
-/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/.private/master_thesis_kremmel/include/master_thesis_kremmel/LandmarkResponse.h
-string
--
-vector
--
-memory
--
-ros/types.h
--
-ros/serialization.h
--
-ros/builtin_message_traits.h
--
-ros/message_operations.h
--
-
-/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel/src/json.hpp
+/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel/src/json.hpp
 algorithm
 -
 cstddef
@@ -432,7 +390,7 @@ any
 string_view
 -
 
-/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel/src/landmarkProcessing.cpp
+/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel/src/landmarkProcessing.cpp
 ros/ros.h
 -
 ros/package.h
@@ -460,7 +418,7 @@ iostream
 fstream
 -
 json.hpp
-/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel/src/json.hpp
+/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel/src/json.hpp
 master_thesis_kremmel/Landmark.h
 -
 

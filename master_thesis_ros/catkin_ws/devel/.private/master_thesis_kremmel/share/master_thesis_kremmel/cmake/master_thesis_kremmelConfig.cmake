@@ -67,14 +67,14 @@ set(master_thesis_kremmel_CONFIG_INCLUDED TRUE)
 
 # set variables for source/devel/install prefixes
 if("TRUE" STREQUAL "TRUE")
-  set(master_thesis_kremmel_SOURCE_PREFIX /home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel)
-  set(master_thesis_kremmel_DEVEL_PREFIX /home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/.private/master_thesis_kremmel)
+  set(master_thesis_kremmel_SOURCE_PREFIX /home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel)
+  set(master_thesis_kremmel_DEVEL_PREFIX /home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/.private/master_thesis_kremmel)
   set(master_thesis_kremmel_INSTALL_PREFIX "")
   set(master_thesis_kremmel_PREFIX ${master_thesis_kremmel_DEVEL_PREFIX})
 else()
   set(master_thesis_kremmel_SOURCE_PREFIX "")
   set(master_thesis_kremmel_DEVEL_PREFIX "")
-  set(master_thesis_kremmel_INSTALL_PREFIX /home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/install)
+  set(master_thesis_kremmel_INSTALL_PREFIX /home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/install)
   set(master_thesis_kremmel_PREFIX ${master_thesis_kremmel_INSTALL_PREFIX})
 endif()
 
@@ -91,9 +91,9 @@ endif()
 # flag project as catkin-based to distinguish if a find_package()-ed project is a catkin project
 set(master_thesis_kremmel_FOUND_CATKIN_PROJECT TRUE)
 
-if(NOT "/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/.private/master_thesis_kremmel/include " STREQUAL " ")
+if(NOT "/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/.private/master_thesis_kremmel/include " STREQUAL " ")
   set(master_thesis_kremmel_INCLUDE_DIRS "")
-  set(_include_dirs "/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/.private/master_thesis_kremmel/include")
+  set(_include_dirs "/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/.private/master_thesis_kremmel/include")
   if(NOT " " STREQUAL " ")
     set(_report "Check the issue tracker '' and consider creating a ticket if the problem has not been reported yet.")
   elseif(NOT " " STREQUAL " ")
@@ -110,7 +110,7 @@ if(NOT "/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/.priva
         message(FATAL_ERROR "Project 'master_thesis_kremmel' specifies '${idir}' as an include dir, which is not found.  It does not exist in '${include}'.  ${_report}")
       endif()
     else()
-      message(FATAL_ERROR "Project 'master_thesis_kremmel' specifies '${idir}' as an include dir, which is not found.  It does neither exist as an absolute directory nor in '/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel/${idir}'.  ${_report}")
+      message(FATAL_ERROR "Project 'master_thesis_kremmel' specifies '${idir}' as an include dir, which is not found.  It does neither exist as an absolute directory nor in '/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel/${idir}'.  ${_report}")
     endif()
     _list_append_unique(master_thesis_kremmel_INCLUDE_DIRS ${include})
   endforeach()
@@ -154,7 +154,7 @@ foreach(library ${libraries})
     set(lib_path "")
     set(lib "${library}-NOTFOUND")
     # since the path where the library is found is returned we have to iterate over the paths manually
-    foreach(path /home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/.private/master_thesis_kremmel/lib;/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/lib;/opt/ros/noetic/lib)
+    foreach(path /home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/.private/master_thesis_kremmel/lib;/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/lib;/opt/ros/noetic/lib)
       find_library(lib ${library}
         PATHS ${path}
         NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
