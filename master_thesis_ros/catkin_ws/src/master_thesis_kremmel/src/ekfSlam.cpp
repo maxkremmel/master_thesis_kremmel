@@ -18,10 +18,9 @@
 #include <Eigen/Dense>
 #include "json.hpp"
 #include <master_thesis_kremmel/Landmark.h>
+#include <master_thesis_kremmel/MoveRobot.h>
 
 using json = nlohmann::json;
-using Eigen::MatrixXd;
-using Eigen::VectorXd;
 
 class EKFSlam
 {
@@ -35,8 +34,8 @@ public:
         convergedLandmarksPublisher = n.advertise<sensor_msgs::PointCloud2>("ekf_slam/converged_landmarks", 1);
         covEllipseMsgPublisher = n.advertise<visualization_msgs::Marker>("/ekf_slam/current_state_marker", 1);
         predictedMeasPublisher = n.advertise<visualization_msgs::Marker>("/ekf_slam/predicted_meas", 1);
-        actualMeasPublisher = n.advertise<visualization_msgs::Marker>("/ekf_slam/actual_meas", 1);
         currentStatePublisher = n.advertise<nav_msgs::Odometry>("/ekf_slam/current_state", 1);
+        wheelOdometryPublisher = n.advertise<nav_msgs::Odometry>("/ekf_slam/wheel_odometry", 1);
         measuredLMposePublisher = n.advertise<visualization_msgs::Marker>("/ekf_slam/measured_lm_pose", 1);
 
         sync.reset(new Sync(SyncRule(10), jointStateSubcriber, laserScanSubscriber));
@@ -44,6 +43,7 @@ public:
         listener = new tf2_ros::TransformListener(tfBuffer); // TransformListener mit Buffer initialisieren
 
         newLMservice = n.advertiseService("newLMservice", &EKFSlam::newLMcallback, this);
+        moveCurrentStateService = n.advertiseService("moveCurrentState", &EKFSlam::moveCurrentStateCallback, this);
 
         // Initialisierung des EKF
         EPS = 1e-4;
@@ -55,11 +55,9 @@ public:
 
         state_vector.resize(DIMsize);
         state_vector.setZero();
-        state_vector(0) = 0;
-        state_vector(1) = 0;
-        state_vector(2) = 0; // ToDo: Wenn Roboter eingeschaltet wird haben wird pose 0. Wie wird das in der Praxis umgesetzt?
         state_vector_last.resize(DIMsize);
         state_vector_last.setZero();
+        state_vector_wheel_odom.setZero();
 
         stored_landmarks = new Landmark[NUM_LM];
 
@@ -69,10 +67,16 @@ public:
         diag.setIdentity();
         diag = diag * 100000.0;
         Cov.bottomRightCorner(2 * NUM_LM, 2 * NUM_LM) = diag;
+        Cov(0, 0) = 0;
+        Cov(1, 1) = 0;
+        Cov(2, 2) = 0;
 
         Q.resize(2, 2);
-        Q << 0.03, 0, // Werte aus Velodyne VLP-16 Datenblatt
-            0, 0.0625;
+        /*  Q << 0.03, 0, // Werte aus Velodyne VLP-16 Datenblatt
+             0, 0.0625; */
+
+        Q << 5, 0, // Werte aus Velodyne VLP-16 Datenblatt
+            0, 10;
 
         ros::param::get("/EKFSlam/alpha1", alpha1);
         ros::param::get("/EKFSlam/alpha2", alpha2);
@@ -98,50 +102,6 @@ public:
         predictedMeas.pose.orientation.w = 1.0;
     }
 
-    void publishPredictedMeas(int i)
-    {
-        int cov_index = 3 + 2 * i;
-        predictedMeas.header.frame_id = "odom";
-        predictedMeas.header.stamp = ros::Time::now();
-        predictedMeas.ns = "predicted_measurement";
-        predictedMeas.action = visualization_msgs::Marker::ADD;
-        predictedMeas.pose.orientation.w = 1.0;
-        predictedMeas.id = 1;
-        predictedMeas.type = visualization_msgs::Marker::LINE_LIST;
-        predictedMeas.scale.x = 0.03;
-        predictedMeas.color.r = 1.0;
-        predictedMeas.color.b = 0.6;
-        predictedMeas.color.a = 1.0;
-
-        geometry_msgs::Point p;
-        p.x = state_vector(0);
-        p.y = state_vector(1);
-        p.z = 0;
-        predictedMeas.points.push_back(p);
-        p.x = state_vector(cov_index);
-        p.y = state_vector(cov_index + 1);
-        predictedMeas.points.push_back(p);
-    }
-    void publishMeasuredLMpose(geometry_msgs::Point landmarkPose, int i)
-    {
-        int cov_index = 3 + 2 * i;
-        measuredLMpose.header.frame_id = "velodyne";
-        measuredLMpose.header.stamp = ros::Time::now();
-        measuredLMpose.ns = "measured_landmark_pose";
-        measuredLMpose.action = visualization_msgs::Marker::ADD;
-        measuredLMpose.pose.orientation.w = 1.0;
-        measuredLMpose.id = i;
-        measuredLMpose.type = visualization_msgs::Marker::LINE_LIST;
-        measuredLMpose.scale.x = 0.03;
-        measuredLMpose.color.r = 0.5;
-        measuredLMpose.color.g = 1.0;
-        measuredLMpose.color.a = 1.0;
-
-        measuredLMpose.points.push_back(landmarkPose);
-        landmarkPose.z = 1;
-        measuredLMpose.points.push_back(landmarkPose);
-    }
-
     void predict(const sensor_msgs::JointState::ConstPtr &jointStates, const sensor_msgs::PointCloud2ConstPtr &new_laserscan_msg)
     {
         double dt = ros::Time::now().toSec() - last_timestamp; // Zeitspanne seit letztem Funktionsaufruf berechnen
@@ -150,8 +110,6 @@ public:
         Eigen::MatrixXd G; // Jakobi des Bewegungsmodells
         G.resize(DIMsize, DIMsize);
         G.setIdentity();
-        Eigen::Matrix<double, 3, 2> V = Eigen::Matrix<double, 3, 2>::Zero();
-        Eigen::Matrix<double, 2, 2> M = Eigen::Matrix<double, 2, 2>::Zero();
         Eigen::Matrix<double, 3, 3> Gx = Eigen::Matrix<double, 3, 3>::Identity();
 
         double alphaRight = jointStates->position[0] - alphaRightLast;
@@ -166,50 +124,48 @@ public:
 
         double v = (vr + vl) / 2; // Berechnung der Geschwindigkeit des Roboters in seiner x-Richtung
         double w = (vr - vl) / l; // Berechnung der Winkelgeschwindigkeit um seine z-Achse
-
         double theta = state_vector_last(2);
 
-        M(0, 0) = pow(alpha1 * fabs(v) + alpha2 * fabs(w), 2); // velocity
-        M(1, 1) = pow(alpha3 * fabs(v) + alpha4 * fabs(w), 2); // angular velocity
+        Eigen::Vector3d newMovement;
+        newMovement.setZero();
 
         if (abs(w) > EPS) // Verhindern von Division durch 0 bzw. fast 0
         {
-            state_vector(0) += -(v / w) * sin(theta) + (v / w) * sin(theta + w * dt);
-            state_vector(1) += +(v / w) * cos(theta) - (v / w) * cos(theta + w * dt);
-            state_vector(2) += w * dt;
+            newMovement(0) = -(v / w) * sin(theta) + (v / w) * sin(theta + w * dt);
+            newMovement(1) = +(v / w) * cos(theta) - (v / w) * cos(theta + w * dt);
+            newMovement(2) = w * dt;
 
             Gx(0, 2) = -(v / w) * cos(theta) + (v / w) * cos(theta + w * dt);
             Gx(1, 2) = -(v / w) * sin(theta) + (v / w) * sin(theta + w * dt);
-
             G.block(0, 0, 3, 3) = Gx;
-
-            // Jacobian for motion noise model
-            V(0, 0) = (-sin(theta) + sin(theta + w * dt)) / w;
-            V(1, 0) = (cos(theta) - cos(theta + w * dt)) / w;
-            V(0, 1) = v * (sin(theta) - sin(theta + w * dt)) / (w * w) + v * cos(theta + w * dt) * dt / w;
-            V(1, 1) = -v * (cos(theta) - cos(theta + w * dt)) / (w * w) + v * sin(theta + w * dt) * dt / w;
-            V(2, 0) = 0;
-            V(2, 1) = dt;
         }
         else
         {
-            state_vector(0) += cos(theta) * v * dt;
-            state_vector(1) += sin(theta) * v * dt;
+            newMovement(0) = cos(theta) * v * dt;
+            newMovement(1) = sin(theta) * v * dt;
 
             // D'Hospital Regel angewendet um numerische Fehler (Division durch Null) zu vermeiden
             Gx(0, 2) = -v * sin(theta) * dt;
             Gx(1, 2) = v * cos(theta) * dt;
             G.block(0, 0, 3, 3) = Gx;
-
-            V(0, 0) = cos(theta) * dt;
-            V(1, 0) = sin(theta) * dt;
-            V(0, 1) = -v * sin(theta) * dt * dt * 0.5;
-            V(1, 1) = v * cos(theta) * dt * dt * 0.5;
-            V(2, 0) = 0;
-            V(2, 1) = dt;
         }
 
-        Eigen::MatrixXd R = V * M * V.transpose();
+        state_vector.head(3) += newMovement;
+        state_vector_wheel_odom += newMovement;
+
+        nav_msgs::Odometry currentWheelOdometry;
+        currentWheelOdometry.pose.pose.position.x = state_vector_wheel_odom(0);
+        currentWheelOdometry.pose.pose.position.y = state_vector_wheel_odom(1);
+        currentWheelOdometry.pose.pose.orientation = tf2::toMsg(getQuat(state_vector_wheel_odom(2)));
+        currentWheelOdometry.child_frame_id = "base_footprint";
+        currentWheelOdometry.header.frame_id = "odom";
+        currentWheelOdometry.header.stamp = ros::Time::now();
+        wheelOdometryPublisher.publish(currentWheelOdometry);
+
+        Eigen::Matrix<double, 3, 3> R = Eigen::Matrix<double, 3, 3>::Zero();
+        R(0,0) = 0.01;
+        R(1,1) = 0.01;
+        R(2,2) = 0.01;
         Cov = G * Cov * G.transpose();
         Cov.block(0, 0, 3, 3) += R;
 
@@ -249,14 +205,14 @@ public:
             {
                 Eigen::Vector2d predictedMeasurment;
                 predictedMeasurment(0) = sqrt(q);
-                predictedMeasurment(1) = constrain_angle(atan2(delta(1), delta(0)) - state_vector(3));
+                predictedMeasurment(1) = constrain_angle(atan2(delta(1), delta(0)) - state_vector(2));
 
                 publishPredictedMeas(i);
 
                 Eigen::MatrixXd H_low(2, 5);
                 H_low << -sqrt(q) * delta(0), -sqrt(q) * delta(1), 0, sqrt(q) * delta(0), sqrt(q) * delta(1),
                     delta(1), -delta(0), -q, -delta(1), delta(0);
-                H_low = H_low * 1 / q;
+                H_low /= q;
 
                 H_i.block(0, 0, 2, 3) = H_low.block(0, 0, 2, 3);
                 H_i(0, cov_index) = H_low(0, 3);
@@ -270,17 +226,16 @@ public:
 
                 if (actualMeasurement(0) != -1)
                 {
-                    std::cout << actualMeasurement - predictedMeasurment << std::endl
-                              << std::endl;
-                    state_vector = state_vector + K * (actualMeasurement - predictedMeasurment); // state_vektor updaten
-                    Cov = (MatrixXd::Identity(Cov.rows(), Cov.rows()) - K * H_i) * Cov;          // Cov updaten
+                    Eigen::MatrixXd d = (actualMeasurement - predictedMeasurment);
+                    d(1) = constrain_angle(d(1));
+                    state_vector = state_vector + K * d;
+                    Cov = (Eigen::MatrixXd::Identity(Cov.rows(), Cov.rows()) - K * H_i) * Cov; // Cov updaten
                 }
                 else
                 {
                     // skip the update step
                 }
             }
-
             *storedLMs += stored_landmarks[i].pointcloud;
         }
 
@@ -304,6 +259,7 @@ public:
     {
         int cov_index = 3 + 2 * i;
         pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_landmark_target(new pcl::PointCloud<pcl::PointXYZ>);
+        Eigen::Vector2d actualMeasurement;
 
         *pcl_landmark_target = stored_landmarks[i].pointcloud;
         geometry_msgs::TransformStamped toVelodynetransform;
@@ -315,6 +271,8 @@ public:
         catch (tf2::TransformException &ex)
         {
             ROS_WARN("%s", ex.what());
+            actualMeasurement(0) = -1;
+            return actualMeasurement;
         }
 
         tf::Transform transform;
@@ -332,38 +290,28 @@ public:
         icp.align(*pcl_landmark_target);
 
         double fitnessScore = icp.getFitnessScore();
-        Eigen::Vector2d actualMeasurement;
-
-        std::cout << "Fitness score of LM" << i << ": " << fitnessScore << std::endl;
 
         if (fitnessScore < 0.05)
         {
             *convergedLMs += *pcl_landmark_target;
 
             geometry_msgs::Point landmarkPose(stored_landmarks[i].pose);
-
             tf2::doTransform(landmarkPose, landmarkPose, toVelodynetransform);
-
             publishMeasuredLMpose(landmarkPose, i * 2);
-            std::cout << "Stored LM pose " << landmarkPose << std::endl;
 
             double x_mean = 0;
             double y_mean = 0;
             for (pcl::PointCloud<pcl::PointXYZ>::iterator it = pcl_landmark_target->begin(); it != pcl_landmark_target->end(); it++)
             {
-
                 x_mean += it->x;
                 y_mean += it->y;
             }
             x_mean /= pcl_landmark_target->size();
             y_mean /= pcl_landmark_target->size();
-
             landmarkPose.x = x_mean;
             landmarkPose.y = y_mean;
 
             publishMeasuredLMpose(landmarkPose, i * 2 + 1);
-            std::cout << "Measured LM pose " << landmarkPose << std::endl;
-
             tf2::doTransform(landmarkPose, landmarkPose, toOdomtransform);
 
             Eigen::Vector2d delta_actual;
@@ -372,7 +320,7 @@ public:
 
             double q = delta_actual.transpose() * delta_actual;
             actualMeasurement(0) = sqrt(q);
-            actualMeasurement(1) = constrain_angle(atan2(delta_actual(1), delta_actual(0)) - state_vector(3));
+            actualMeasurement(1) = constrain_angle(atan2(delta_actual(1), delta_actual(0)) - state_vector(2));
         }
         else
         {
@@ -429,6 +377,16 @@ public:
         return true;
     }
 
+    bool moveCurrentStateCallback(master_thesis_kremmel::MoveRobot::Request &req, master_thesis_kremmel::MoveRobot::Response &res)
+    {
+        state_vector(0) += (double)req.x;
+        state_vector(1) += (double)req.y;
+        state_vector(2) += (double)(req.t * M_PI) / 180;
+
+        res.success = true;
+        return true;
+    }
+
     double constrain_angle(double radian)
     {
         if (radian < -M_PI)
@@ -460,6 +418,51 @@ public:
         tf2::Quaternion quat;
         quat.setRPY(0, 0, theta);
         return quat;
+    }
+
+    void publishPredictedMeas(int i)
+    {
+        int cov_index = 3 + 2 * i;
+        predictedMeas.header.frame_id = "odom";
+        predictedMeas.header.stamp = ros::Time::now();
+        predictedMeas.ns = "predicted_measurement";
+        predictedMeas.action = visualization_msgs::Marker::ADD;
+        predictedMeas.pose.orientation.w = 1.0;
+        predictedMeas.id = 1;
+        predictedMeas.type = visualization_msgs::Marker::LINE_LIST;
+        predictedMeas.scale.x = 0.03;
+        predictedMeas.color.r = 1.0;
+        predictedMeas.color.b = 0.6;
+        predictedMeas.color.a = 1.0;
+
+        geometry_msgs::Point p;
+        p.x = state_vector(0);
+        p.y = state_vector(1);
+        p.z = 0;
+        predictedMeas.points.push_back(p);
+        p.x = state_vector(cov_index);
+        p.y = state_vector(cov_index + 1);
+        predictedMeas.points.push_back(p);
+    }
+
+    void publishMeasuredLMpose(geometry_msgs::Point landmarkPose, int i)
+    {
+        int cov_index = 3 + 2 * i;
+        measuredLMpose.header.frame_id = "velodyne";
+        measuredLMpose.header.stamp = ros::Time::now();
+        measuredLMpose.ns = "measured_landmark_pose";
+        measuredLMpose.action = visualization_msgs::Marker::ADD;
+        measuredLMpose.pose.orientation.w = 1.0;
+        measuredLMpose.id = i;
+        measuredLMpose.type = visualization_msgs::Marker::LINE_LIST;
+        measuredLMpose.scale.x = 0.03;
+        measuredLMpose.color.r = 0.5;
+        measuredLMpose.color.g = 1.0;
+        measuredLMpose.color.a = 1.0;
+
+        measuredLMpose.points.push_back(landmarkPose);
+        landmarkPose.z = 1;
+        measuredLMpose.points.push_back(landmarkPose);
     }
 
     void publishEllipses()
@@ -546,7 +549,7 @@ public:
             ellipsePose.orientation = tf2::toMsg(quat);
             nav_msgs::Odometry currentStateMsg;
             currentStateMsg.pose.pose = ellipsePose;
-            currentStateMsg.child_frame_id = "base_link";
+            currentStateMsg.child_frame_id = "base_footprint";
             currentStateMsg.header.frame_id = "odom";
             currentStateMsg.header.stamp = ros::Time::now();
             currentStatePublisher.publish(currentStateMsg);
@@ -567,11 +570,11 @@ public:
 private:
     ros::NodeHandle n;
     ros::Publisher covEllipseMsgPublisher;
+    ros::Publisher wheelOdometryPublisher;
     ros::Publisher currentStatePublisher;
     ros::Publisher storedLandmarksPublisher;
     ros::Publisher convergedLandmarksPublisher;
     ros::Publisher predictedMeasPublisher;
-    ros::Publisher actualMeasPublisher;
     ros::Publisher measuredLMposePublisher;
 
     message_filters::Subscriber<sensor_msgs::PointCloud2> laserScanSubscriber;
@@ -581,6 +584,7 @@ private:
     boost::shared_ptr<Sync> sync;
 
     ros::ServiceServer newLMservice;
+    ros::ServiceServer moveCurrentStateService;
 
     double last_timestamp; // Zeitspanne die zwischen den Funktionsaufrufen vergeht
     int DIMsize;
@@ -589,9 +593,10 @@ private:
     double alpha2;
     double alpha3;
     double alpha4;
-    Eigen::VectorXd state_vector;      // Zustands Vektor der Pose und der Landmarken
-    Eigen::VectorXd state_vector_last; // Zustands Vektor der Pose und der Landmarken bei letztem Aufruf der Predict Methode
-    Eigen::MatrixXd Cov;               // Covarianzmatrix des Zustandsvekotors (Roboterpose und Landmarken)
+    Eigen::Vector3d state_vector_wheel_odom; // Zustandsvektor ohne Correction...also nur Wheel Odomentry
+    Eigen::VectorXd state_vector;            // Zustands Vektor der Pose und der Landmarken
+    Eigen::VectorXd state_vector_last;       // Zustands Vektor der Pose und der Landmarken bei letztem Aufruf der Predict Methode
+    Eigen::MatrixXd Cov;                     // Covarianzmatrix des Zustandsvekotors (Roboterpose und Landmarken)
     int numberOfStoredLandmarks;
 
     double alphaRightLast;

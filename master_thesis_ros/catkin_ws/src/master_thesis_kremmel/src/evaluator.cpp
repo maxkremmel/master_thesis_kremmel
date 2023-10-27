@@ -16,11 +16,11 @@ public:
         sync.reset(new Sync(SyncRule(10), groundTruthSubcriber, currentStateSubscriber)); 
         sync->registerCallback(boost::bind(&Evaluator::callback, this, _1, _2));         // Zuweisen des synchronisierten Callbacks
 
-        poseDiffPublisher = n.advertise<geometry_msgs::Point>("/poseDiff", 1);
+        poseDiffPublisher = n.advertise<geometry_msgs::Point>("evaluator/poseDiff", 1);
         ros::Duration(3).sleep(); // Warten
     }
 
-    void callback(const nav_msgs::Odometry::ConstPtr &groundTruthMsg, const geometry_msgs::PoseWithCovarianceStamped::ConstPtr &currentStateMsg)
+    void callback(const nav_msgs::Odometry::ConstPtr &groundTruthMsg, const nav_msgs::Odometry::ConstPtr &currentStateMsg)
     {
         geometry_msgs::Point diff;
         double diff_x = groundTruthMsg->pose.pose.position.x - currentStateMsg->pose.pose.position.x;
@@ -35,9 +35,9 @@ private:
     ros::Publisher poseDiffPublisher;
 
     message_filters::Subscriber<nav_msgs::Odometry> groundTruthSubcriber;
-    message_filters::Subscriber<geometry_msgs::PoseWithCovarianceStamped> currentStateSubscriber;
+    message_filters::Subscriber<nav_msgs::Odometry> currentStateSubscriber;
 
-    typedef message_filters::sync_policies::ApproximateTime<nav_msgs::Odometry, geometry_msgs::PoseWithCovarianceStamped> SyncRule;
+    typedef message_filters::sync_policies::ApproximateTime<nav_msgs::Odometry, nav_msgs::Odometry> SyncRule;
     typedef message_filters::Synchronizer<SyncRule> Sync;
     boost::shared_ptr<Sync> sync;
 };

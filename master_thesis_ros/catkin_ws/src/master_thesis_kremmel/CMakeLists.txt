@@ -16,6 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
 add_service_files(
   FILES
   Landmark.srv
+  MoveRobot.srv
 )
 
 generate_messages(
@@ -45,9 +46,6 @@ include_directories(
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 
-add_executable(TransformLaserScan src/transformLaserScan.cpp)
-target_link_libraries(TransformLaserScan ${catkin_LIBRARIES} ${PCL_LIBRARIES})
-
 add_executable(LandmarkProcessor src/landmarkProcessing.cpp)
 target_link_libraries(LandmarkProcessor ${catkin_LIBRARIES} ${PCL_LIBRARIES})
 
@@ -56,10 +54,6 @@ target_link_libraries(EKFSlam ${catkin_LIBRARIES} ${EIGEN3_LIBRARIES} ${PCL_LIBR
 
 add_executable(Evaluator src/evaluator.cpp)
 target_link_libraries(Evaluator ${catkin_LIBRARIES})
-
-add_executable(CmdVelSmoother src/cmdVelSmoother.cpp)
-target_link_libraries(CmdVelSmoother ${catkin_LIBRARIES} )
-
 
 #add_executable(PubToCmdVel src/pubToCmdVel.cpp)
 #target_link_libraries(PubToCmdVel ${catkin_LIBRARIES})

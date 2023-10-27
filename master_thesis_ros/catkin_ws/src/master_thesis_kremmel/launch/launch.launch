@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
   <arg name="file_server" default="true" />
-  <arg name="teleop" default="false" />
+  <arg name="teleop" default="true" />
   <arg name="joy_teleop" default="false" />
   <arg name="gui" default="false" />
   <arg name="rviz" default="true" />
@@ -59,15 +59,13 @@
   </group>
 
   <!-- Start Nodes -->
-  <!-- <node name="TransformLaserScan" type="TransformLaserScan" pkg="master_thesis_kremmel"
-    output="screen" /> -->
   <node name="LandmarkProcessor" type="LandmarkProcessor" pkg="master_thesis_kremmel"
     output="screen" />
   <node name="EKFSlam" type="EKFSlam" pkg="master_thesis_kremmel" output="screen">
-    <param name="alpha1" value="0.01" />
+    <param name="alpha1" value="0.1" />
     <param name="alpha2" value="0.0" />
     <param name="alpha3" value="0.001" />
-    <param name="alpha4" value="0.01" />
+    <param name="alpha4" value="0.1" />
   </node>
 
   <!-- PS4 Controller arguments -->

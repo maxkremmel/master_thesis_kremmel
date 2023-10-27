@@ -7,4 +7,6 @@
   :components ((:file "_package")
     (:file "Landmark" :depends-on ("_package_Landmark"))
     (:file "_package_Landmark" :depends-on ("_package"))
+    (:file "MoveRobot" :depends-on ("_package_MoveRobot"))
+    (:file "_package_MoveRobot" :depends-on ("_package"))
   ))

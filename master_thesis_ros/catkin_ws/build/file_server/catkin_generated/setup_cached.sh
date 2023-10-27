@@ -7,7 +7,10 @@
 # new environment variables
 
 # modified environment variables
-export CMAKE_PREFIX_PATH="/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/.private/file_server:$CMAKE_PREFIX_PATH"
-export PWD='/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/build/file_server'
-export ROSLISP_PACKAGE_DIRECTORIES="/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/.private/file_server/share/common-lisp:$ROSLISP_PACKAGE_DIRECTORIES"
-export ROS_PACKAGE_PATH="/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/file_server:$ROS_PACKAGE_PATH"
+export CMAKE_PREFIX_PATH="/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/.private/file_server:$CMAKE_PREFIX_PATH"
+export LD_LIBRARY_PATH="/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/.private/file_server/lib:$LD_LIBRARY_PATH"
+export PKG_CONFIG_PATH="/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/.private/file_server/lib/pkgconfig:$PKG_CONFIG_PATH"
+export PWD='/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/build/file_server'
+export PYTHONPATH="/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/.private/file_server/lib/python3/dist-packages:$PYTHONPATH"
+export ROSLISP_PACKAGE_DIRECTORIES="/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/.private/file_server/share/common-lisp:$ROSLISP_PACKAGE_DIRECTORIES"
+export ROS_PACKAGE_PATH="/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/file_server:$ROS_PACKAGE_PATH"

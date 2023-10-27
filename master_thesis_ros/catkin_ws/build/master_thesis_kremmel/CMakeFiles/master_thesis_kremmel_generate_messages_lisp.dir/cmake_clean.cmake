@@ -1,5 +1,6 @@
 file(REMOVE_RECURSE
-  "/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/.private/master_thesis_kremmel/share/common-lisp/ros/master_thesis_kremmel/srv/Landmark.lisp"
+  "/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/.private/master_thesis_kremmel/share/common-lisp/ros/master_thesis_kremmel/srv/Landmark.lisp"
+  "/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/.private/master_thesis_kremmel/share/common-lisp/ros/master_thesis_kremmel/srv/MoveRobot.lisp"
   "CMakeFiles/master_thesis_kremmel_generate_messages_lisp"
 )
 

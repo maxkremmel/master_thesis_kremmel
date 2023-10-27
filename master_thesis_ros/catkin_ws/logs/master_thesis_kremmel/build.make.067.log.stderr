@@ -1,0 +1,12 @@
+In file included from [01m[K/usr/include/eigen3/Eigen/Core:366[m[K,
+                 from [01m[K/usr/include/eigen3/Eigen/Geometry:11[m[K,
+                 from [01m[K/opt/ros/noetic/include/tf2_eigen/tf2_eigen.h:33[m[K,
+                 from [01m[K/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel/src/ekfSlam.cpp:9[m[K:
+/usr/include/eigen3/Eigen/src/plugins/BlockMethods.h: In instantiation of ‘[01m[KEigen::DenseBase<Derived>::SegmentReturnType Eigen::DenseBase<Derived>::head(Eigen::Index) [with Derived = Eigen::Matrix<double, -1, -1>; Eigen::DenseBase<Derived>::SegmentReturnType = Eigen::VectorBlock<Eigen::Matrix<double, -1, -1>, -1>; Eigen::Index = long int][m[K’:
+[01m[K/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel/src/ekfSlam.cpp:257:67:[m[K   required from here
+[01m[K/usr/include/eigen3/Eigen/src/plugins/BlockMethods.h:921:3:[m[K [01;31m[Kerror: [m[Kstatic assertion failed: YOU_TRIED_CALLING_A_VECTOR_METHOD_ON_A_MATRIX
+  921 |   [01;31m[KEIGEN_STATIC_ASSERT_VECTOR_ONLY[m[K(Derived)
+      |   [01;31m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+make[2]: *** [CMakeFiles/EKFSlam.dir/build.make:63: CMakeFiles/EKFSlam.dir/src/ekfSlam.cpp.o] Error 1
+make[1]: *** [CMakeFiles/Makefile2:236: CMakeFiles/EKFSlam.dir/all] Error 2
+make: *** [Makefile:141: all] Error 2

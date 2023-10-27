@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel/src/json.hpp
+/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel/src/json.hpp
 algorithm
 -
 cstddef
@@ -390,7 +390,7 @@ any
 string_view
 -
 
-/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel/src/landmarkProcessing.cpp
+/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel/src/landmarkProcessing.cpp
 ros/ros.h
 -
 ros/package.h
@@ -418,7 +418,7 @@ iostream
 fstream
 -
 json.hpp
-/home/max/Dokumente/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel/src/json.hpp
+/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel/src/json.hpp
 master_thesis_kremmel/Landmark.h
 -
 
