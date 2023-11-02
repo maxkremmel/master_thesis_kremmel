@@ -194,6 +194,19 @@ LandmarkProcessor/fast:
 .PHONY : LandmarkProcessor/fast
 
 #=============================================================================
+# Target rules for targets named TransformLaserScan
+
+# Build rule for target.
+TransformLaserScan: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 TransformLaserScan
+.PHONY : TransformLaserScan
+
+# fast build rule for target.
+TransformLaserScan/fast:
+	$(MAKE) -f CMakeFiles/TransformLaserScan.dir/build.make CMakeFiles/TransformLaserScan.dir/build
+.PHONY : TransformLaserScan/fast
+
+#=============================================================================
 # Target rules for targets named master_thesis_kremmel_generate_messages_nodejs
 
 # Build rule for target.
@@ -400,6 +413,19 @@ actionlib_generate_messages_cpp: cmake_check_build_system
 actionlib_generate_messages_cpp/fast:
 	$(MAKE) -f CMakeFiles/actionlib_generate_messages_cpp.dir/build.make CMakeFiles/actionlib_generate_messages_cpp.dir/build
 .PHONY : actionlib_generate_messages_cpp/fast
+
+#=============================================================================
+# Target rules for targets named CmdVelSmoother
+
+# Build rule for target.
+CmdVelSmoother: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 CmdVelSmoother
+.PHONY : CmdVelSmoother
+
+# fast build rule for target.
+CmdVelSmoother/fast:
+	$(MAKE) -f CMakeFiles/CmdVelSmoother.dir/build.make CMakeFiles/CmdVelSmoother.dir/build
+.PHONY : CmdVelSmoother/fast
 
 #=============================================================================
 # Target rules for targets named tf_generate_messages_nodejs
@@ -1506,6 +1532,33 @@ gtest/fast:
 	$(MAKE) -f gtest/googletest/CMakeFiles/gtest.dir/build.make gtest/googletest/CMakeFiles/gtest.dir/build
 .PHONY : gtest/fast
 
+src/cmdVelSmoother.o: src/cmdVelSmoother.cpp.o
+
+.PHONY : src/cmdVelSmoother.o
+
+# target to build an object file
+src/cmdVelSmoother.cpp.o:
+	$(MAKE) -f CMakeFiles/CmdVelSmoother.dir/build.make CMakeFiles/CmdVelSmoother.dir/src/cmdVelSmoother.cpp.o
+.PHONY : src/cmdVelSmoother.cpp.o
+
+src/cmdVelSmoother.i: src/cmdVelSmoother.cpp.i
+
+.PHONY : src/cmdVelSmoother.i
+
+# target to preprocess a source file
+src/cmdVelSmoother.cpp.i:
+	$(MAKE) -f CMakeFiles/CmdVelSmoother.dir/build.make CMakeFiles/CmdVelSmoother.dir/src/cmdVelSmoother.cpp.i
+.PHONY : src/cmdVelSmoother.cpp.i
+
+src/cmdVelSmoother.s: src/cmdVelSmoother.cpp.s
+
+.PHONY : src/cmdVelSmoother.s
+
+# target to generate assembly for a file
+src/cmdVelSmoother.cpp.s:
+	$(MAKE) -f CMakeFiles/CmdVelSmoother.dir/build.make CMakeFiles/CmdVelSmoother.dir/src/cmdVelSmoother.cpp.s
+.PHONY : src/cmdVelSmoother.cpp.s
+
 src/ekfSlam.o: src/ekfSlam.cpp.o
 
 .PHONY : src/ekfSlam.o
@@ -1587,6 +1640,33 @@ src/landmarkProcessing.cpp.s:
 	$(MAKE) -f CMakeFiles/LandmarkProcessor.dir/build.make CMakeFiles/LandmarkProcessor.dir/src/landmarkProcessing.cpp.s
 .PHONY : src/landmarkProcessing.cpp.s
 
+src/transformLaserScan.o: src/transformLaserScan.cpp.o
+
+.PHONY : src/transformLaserScan.o
+
+# target to build an object file
+src/transformLaserScan.cpp.o:
+	$(MAKE) -f CMakeFiles/TransformLaserScan.dir/build.make CMakeFiles/TransformLaserScan.dir/src/transformLaserScan.cpp.o
+.PHONY : src/transformLaserScan.cpp.o
+
+src/transformLaserScan.i: src/transformLaserScan.cpp.i
+
+.PHONY : src/transformLaserScan.i
+
+# target to preprocess a source file
+src/transformLaserScan.cpp.i:
+	$(MAKE) -f CMakeFiles/TransformLaserScan.dir/build.make CMakeFiles/TransformLaserScan.dir/src/transformLaserScan.cpp.i
+.PHONY : src/transformLaserScan.cpp.i
+
+src/transformLaserScan.s: src/transformLaserScan.cpp.s
+
+.PHONY : src/transformLaserScan.s
+
+# target to generate assembly for a file
+src/transformLaserScan.cpp.s:
+	$(MAKE) -f CMakeFiles/TransformLaserScan.dir/build.make CMakeFiles/TransformLaserScan.dir/src/transformLaserScan.cpp.s
+.PHONY : src/transformLaserScan.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -1598,6 +1678,7 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... EKFSlam"
 	@echo "... LandmarkProcessor"
+	@echo "... TransformLaserScan"
 	@echo "... master_thesis_kremmel_generate_messages_nodejs"
 	@echo "... master_thesis_kremmel_generate_messages_lisp"
 	@echo "... install/strip"
@@ -1615,6 +1696,7 @@ help:
 	@echo "... actionlib_generate_messages_py"
 	@echo "... actionlib_generate_messages_nodejs"
 	@echo "... actionlib_generate_messages_cpp"
+	@echo "... CmdVelSmoother"
 	@echo "... tf_generate_messages_nodejs"
 	@echo "... master_thesis_kremmel_gennodejs"
 	@echo "... tf_generate_messages_lisp"
@@ -1703,6 +1785,9 @@ help:
 	@echo "... gmock"
 	@echo "... gtest_main"
 	@echo "... gtest"
+	@echo "... src/cmdVelSmoother.o"
+	@echo "... src/cmdVelSmoother.i"
+	@echo "... src/cmdVelSmoother.s"
 	@echo "... src/ekfSlam.o"
 	@echo "... src/ekfSlam.i"
 	@echo "... src/ekfSlam.s"
@@ -1712,6 +1797,9 @@ help:
 	@echo "... src/landmarkProcessing.o"
 	@echo "... src/landmarkProcessing.i"
 	@echo "... src/landmarkProcessing.s"
+	@echo "... src/transformLaserScan.o"
+	@echo "... src/transformLaserScan.i"
+	@echo "... src/transformLaserScan.s"
 .PHONY : help
 
 

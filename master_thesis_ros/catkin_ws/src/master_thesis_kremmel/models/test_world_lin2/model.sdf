@@ -1,0 +1,31 @@
+<?xml version='1.0'?>
+<sdf version="1.5">
+  <model name="box">
+    <pose>-12.5 12.5 -0.21 1.57 0 0</pose>
+    <static>true</static>
+    <link name="link">
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <uri>model://test_world_lin2/meshes/test_world_lin2.STL</uri>
+            <scale>0.001 0.001 0.001</scale>
+          </mesh>
+        </geometry>
+        <friction>
+          <ode>
+            <mu>100</mu>
+            <mu2>50</mu2>
+          </ode>
+        </friction>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://test_world_lin2/meshes/test_world_lin2.STL</uri>
+            <scale>0.001 0.001 0.001</scale>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+  </model>
+</sdf>

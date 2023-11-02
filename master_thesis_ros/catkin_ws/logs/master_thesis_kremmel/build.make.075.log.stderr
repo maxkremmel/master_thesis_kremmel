@@ -1,0 +1,10 @@
+[01m[K/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel/src/landmarkProcessing.cpp:[m[K In member function ‘[01m[Kvoid NewLandMarkProcessing::newLandMarkCallback(const PointCloud2ConstPtr&)[m[K’:
+[01m[K/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel/src/landmarkProcessing.cpp:117:21:[m[K [01;31m[Kerror: [m[Kexpected ‘[01m[K;[m[K’ before ‘[01m[K}[m[K’ token
+  117 |                 it++
+      |                     [01;31m[K^[m[K
+      |                     [32m[K;[m[K
+  118 |             [32m[K}[m[K
+      |             [32m[K~[m[K        
+make[2]: *** [CMakeFiles/LandmarkProcessor.dir/build.make:63: CMakeFiles/LandmarkProcessor.dir/src/landmarkProcessing.cpp.o] Error 1
+make[1]: *** [CMakeFiles/Makefile2:265: CMakeFiles/LandmarkProcessor.dir/all] Error 2
+make: *** [Makefile:141: all] Error 2

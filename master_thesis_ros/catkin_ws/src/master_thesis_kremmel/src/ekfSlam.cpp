@@ -1,6 +1,7 @@
 #include <ros/ros.h>
 #include <ros/package.h>
 #include <geometry_msgs/Point.h>
+#include <geometry_msgs/Twist.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <sensor_msgs/JointState.h>
 #include <nav_msgs/Odometry.h>
@@ -37,6 +38,7 @@ public:
         currentStatePublisher = n.advertise<nav_msgs::Odometry>("/ekf_slam/current_state", 1);
         wheelOdometryPublisher = n.advertise<nav_msgs::Odometry>("/ekf_slam/wheel_odometry", 1);
         measuredLMposePublisher = n.advertise<visualization_msgs::Marker>("/ekf_slam/measured_lm_pose", 1);
+        velocityPublisher = n.advertise<nav_msgs::Odometry>("/ekf_slam/vel", 1); // linear.z is used to publish the number of stored LM
 
         sync.reset(new Sync(SyncRule(10), jointStateSubcriber, laserScanSubscriber));
         sync->registerCallback(boost::bind(&EKFSlam::predict, this, _1, _2));
@@ -45,9 +47,15 @@ public:
         newLMservice = n.advertiseService("newLMservice", &EKFSlam::newLMcallback, this);
         moveCurrentStateService = n.advertiseService("moveCurrentState", &EKFSlam::moveCurrentStateCallback, this);
 
+        int NUM_LM; // Maximale Anzahl der Landmarken
+        // Paramenter aus Parameterserver auslesen
+        ros::param::get("/EKFSlam/robotBase", robotBase);
+        ros::param::get("/EKFSlam/robotWheelRadius", robotWheelRadius);
+        ros::param::get("/EKFSlam/fitnessScoreThreshhold", fitnessScoreThreshhold);
+        ros::param::get("/EKFSlam/maxNumLandmarks", NUM_LM);
+
         // Initialisierung des EKF
         EPS = 1e-4;
-        int NUM_LM = 20;          // Maximale Anzahl der LM's auf 20 gesetzt
         DIMsize = 3 + 2 * NUM_LM; // Dimension der Jakobimatrizen und der Covarianzmatrizen
 
         alphaRightLast = 0;
@@ -55,9 +63,13 @@ public:
 
         state_vector.resize(DIMsize);
         state_vector.setZero();
+        ros::param::get("/EKFSlam/x_pos", state_vector(0));
+        ros::param::get("/EKFSlam/y_pos", state_vector(1));
+        ros::param::get("/EKFSlam/yaw", state_vector(2));
         state_vector_last.resize(DIMsize);
         state_vector_last.setZero();
         state_vector_wheel_odom.setZero();
+        state_vector_wheel_odom = state_vector.head(3);
 
         stored_landmarks = new Landmark[NUM_LM];
 
@@ -72,22 +84,15 @@ public:
         Cov(2, 2) = 0;
 
         Q.resize(2, 2);
-        /*  Q << 0.03, 0, // Werte aus Velodyne VLP-16 Datenblatt
-             0, 0.0625; */
-
         Q << 5, 0, // Werte aus Velodyne VLP-16 Datenblatt
             0, 10;
 
-        ros::param::get("/EKFSlam/alpha1", alpha1);
-        ros::param::get("/EKFSlam/alpha2", alpha2);
-        ros::param::get("/EKFSlam/alpha3", alpha3);
-        ros::param::get("/EKFSlam/alpha4", alpha4);
-
         last_timestamp = ros::Time::now().toSec();
 
-        // LM JSON Pfad und Inputstream konfigurieren
         std::string packagePath = ros::package::getPath("master_thesis_kremmel");
         std::string jsonPath = packagePath + "/data/stored_landmarks.json";
+
+        // LM JSON Pfad und Inputstream konfigurieren
         std::ifstream f(jsonPath);
         initStateVectorWithLMs(json::parse(f));
 
@@ -110,20 +115,17 @@ public:
         Eigen::MatrixXd G; // Jakobi des Bewegungsmodells
         G.resize(DIMsize, DIMsize);
         G.setIdentity();
-        Eigen::Matrix<double, 3, 3> Gx = Eigen::Matrix<double, 3, 3>::Identity();
 
         double alphaRight = jointStates->position[0] - alphaRightLast;
         double alphaLeft = jointStates->position[1] - alphaLeftLast;
         alphaRightLast = jointStates->position[0];
         alphaLeftLast = jointStates->position[1];
 
-        double r = 0.033;                  // Radius der Räder des Roboters
-        double l = 0.287;                  // Radstand des Roboters
-        double vr = (alphaRight * r) / dt; // Berechnen der Umfangsgeschwindigkeit des rechten Rades
-        double vl = (alphaLeft * r) / dt;  // Berechnen der Umfangsgeschwindigkeit des linken Rades
+        double vr = (alphaRight * robotWheelRadius) / dt; // Berechnen der Umfangsgeschwindigkeit des rechten Rades
+        double vl = (alphaLeft * robotWheelRadius) / dt;  // Berechnen der Umfangsgeschwindigkeit des linken Rades
 
-        double v = (vr + vl) / 2; // Berechnung der Geschwindigkeit des Roboters in seiner x-Richtung
-        double w = (vr - vl) / l; // Berechnung der Winkelgeschwindigkeit um seine z-Achse
+        double v = (vr + vl) / 2;         // Berechnung der Geschwindigkeit des Roboters in seiner x-Richtung
+        double w = (vr - vl) / robotBase; // Berechnung der Winkelgeschwindigkeit um seine z-Achse
         double theta = state_vector_last(2);
 
         Eigen::Vector3d newMovement;
@@ -135,9 +137,8 @@ public:
             newMovement(1) = +(v / w) * cos(theta) - (v / w) * cos(theta + w * dt);
             newMovement(2) = w * dt;
 
-            Gx(0, 2) = -(v / w) * cos(theta) + (v / w) * cos(theta + w * dt);
-            Gx(1, 2) = -(v / w) * sin(theta) + (v / w) * sin(theta + w * dt);
-            G.block(0, 0, 3, 3) = Gx;
+            G(0, 2) = -(v / w) * cos(theta) + (v / w) * cos(theta + w * dt);
+            G(1, 2) = -(v / w) * sin(theta) + (v / w) * sin(theta + w * dt);
         }
         else
         {
@@ -145,9 +146,8 @@ public:
             newMovement(1) = sin(theta) * v * dt;
 
             // D'Hospital Regel angewendet um numerische Fehler (Division durch Null) zu vermeiden
-            Gx(0, 2) = -v * sin(theta) * dt;
-            Gx(1, 2) = v * cos(theta) * dt;
-            G.block(0, 0, 3, 3) = Gx;
+            G(0, 2) = -v * sin(theta) * dt;
+            G(1, 2) = v * cos(theta) * dt;
         }
 
         state_vector.head(3) += newMovement;
@@ -159,19 +159,31 @@ public:
         currentWheelOdometry.pose.pose.orientation = tf2::toMsg(getQuat(state_vector_wheel_odom(2)));
         currentWheelOdometry.child_frame_id = "base_footprint";
         currentWheelOdometry.header.frame_id = "odom";
-        currentWheelOdometry.header.stamp = ros::Time::now();
+        currentWheelOdometry.header.stamp = jointStates->header.stamp;
         wheelOdometryPublisher.publish(currentWheelOdometry);
 
         Eigen::Matrix<double, 3, 3> R = Eigen::Matrix<double, 3, 3>::Zero();
-        R(0,0) = 0.01;
-        R(1,1) = 0.01;
-        R(2,2) = 0.01;
+        R(0, 0) = 0.01;
+        R(1, 1) = 0.01;
+        R(2, 2) = 0.01;
         Cov = G * Cov * G.transpose();
         Cov.block(0, 0, 3, 3) += R;
 
+        numberOfDetectedLandmarks = 0;
+        meanFitnessScore = 0;
         correct(new_laserscan_msg);
+        meanFitnessScore /= numberOfDetectedLandmarks;
 
         state_vector_last = state_vector; // Aktuellen Zustandsvektor in state_vector_last zwischenspeichern
+
+        nav_msgs::Odometry velAndNumOfLmMsg;
+
+        velAndNumOfLmMsg.header = jointStates->header;
+        velAndNumOfLmMsg.twist.twist.linear.x = v;
+        velAndNumOfLmMsg.twist.twist.angular.z = w;
+        velAndNumOfLmMsg.pose.pose.position.x = numberOfDetectedLandmarks;
+        velAndNumOfLmMsg.pose.pose.position.y = meanFitnessScore;
+        velocityPublisher.publish(velAndNumOfLmMsg);
 
         publishEllipses();
         sendNewBaseLinkTransform();
@@ -200,8 +212,8 @@ public:
             delta(0) = state_vector(cov_index) - state_vector(0);
             delta(1) = state_vector(cov_index + 1) - state_vector(1);
             double q = delta.transpose() * delta; // Euklidische Distanz
-            // If stored LM is closer than 5 m...
-            if (sqrt(q) < 8)
+            // If stored LM is closer than 4 m...
+            if (sqrt(q) < 4)
             {
                 Eigen::Vector2d predictedMeasurment;
                 predictedMeasurment(0) = sqrt(q);
@@ -226,6 +238,7 @@ public:
 
                 if (actualMeasurement(0) != -1)
                 {
+                    numberOfDetectedLandmarks++;
                     Eigen::MatrixXd d = (actualMeasurement - predictedMeasurment);
                     d(1) = constrain_angle(d(1));
                     state_vector = state_vector + K * d;
@@ -291,9 +304,10 @@ public:
 
         double fitnessScore = icp.getFitnessScore();
 
-        if (fitnessScore < 0.05)
+        if (fitnessScore < fitnessScoreThreshhold)
         {
             *convergedLMs += *pcl_landmark_target;
+            meanFitnessScore += fitnessScore;
 
             geometry_msgs::Point landmarkPose(stored_landmarks[i].pose);
             tf2::doTransform(landmarkPose, landmarkPose, toVelodynetransform);
@@ -383,7 +397,6 @@ public:
         state_vector(1) += (double)req.y;
         state_vector(2) += (double)(req.t * M_PI) / 180;
 
-        res.success = true;
         return true;
     }
 
@@ -475,7 +488,7 @@ public:
         for (int i = 0; i < numberOfStoredLandmarks; i++)
         {
             landmarkEllipse(i, x, y, lmMinor, lmMajor, lmTheta);
-            if (lmMinor < 100 || lmMajor < 100)
+            if (lmMinor < 20 && lmMajor < 20)
             {
                 publishBelieve(x, y, lmTheta, lmMinor, lmMajor, "lm estimates", i);
             }
@@ -571,6 +584,8 @@ private:
     ros::NodeHandle n;
     ros::Publisher covEllipseMsgPublisher;
     ros::Publisher wheelOdometryPublisher;
+    ros::Publisher velocityPublisher;
+    ros::Publisher numOfDetectedLmPublisher;
     ros::Publisher currentStatePublisher;
     ros::Publisher storedLandmarksPublisher;
     ros::Publisher convergedLandmarksPublisher;
@@ -589,15 +604,16 @@ private:
     double last_timestamp; // Zeitspanne die zwischen den Funktionsaufrufen vergeht
     int DIMsize;
     int EPS; // Threshhold under Omega is treated as zero.
-    double alpha1;
-    double alpha2;
-    double alpha3;
-    double alpha4;
+    double robotBase;
+    double robotWheelRadius;
+    double fitnessScoreThreshhold;
+
     Eigen::Vector3d state_vector_wheel_odom; // Zustandsvektor ohne Correction...also nur Wheel Odomentry
     Eigen::VectorXd state_vector;            // Zustands Vektor der Pose und der Landmarken
     Eigen::VectorXd state_vector_last;       // Zustands Vektor der Pose und der Landmarken bei letztem Aufruf der Predict Methode
     Eigen::MatrixXd Cov;                     // Covarianzmatrix des Zustandsvekotors (Roboterpose und Landmarken)
     int numberOfStoredLandmarks;
+    int numberOfDetectedLandmarks;
 
     double alphaRightLast;
     double alphaLeftLast;
@@ -619,6 +635,8 @@ private:
     geometry_msgs::TransformStamped transformStamped;
 
     visualization_msgs::Marker predictedMeas, actualMeas, measuredLMpose;
+
+    double meanFitnessScore;
 };
 
 int main(int argc, char **argv)

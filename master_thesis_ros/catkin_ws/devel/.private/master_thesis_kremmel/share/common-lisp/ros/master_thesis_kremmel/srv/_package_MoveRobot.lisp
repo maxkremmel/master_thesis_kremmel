@@ -5,6 +5,4 @@
           Y
           T-VAL
           T
-          SUCCESS-VAL
-          SUCCESS
 ))

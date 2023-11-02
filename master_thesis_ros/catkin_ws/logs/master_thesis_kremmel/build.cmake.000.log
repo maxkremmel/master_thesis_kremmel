@@ -146,17 +146,5 @@ but not all the files it references.
 [36m--[0m Checking for module 'eigen3'
 [36m--[0m   Found eigen3, version 3.3.7
 [36m--[0m Configuring done
-[31m[1mCMake Error[0m at /home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel/CMakeLists.txt:61 (add_executable):
-  Cannot find source file:
-
-    src/cmdVelSmoother.cpp
-
-  Tried extensions .c .C .c++ .cc .cpp .cxx .cu .m .M .mm .h .hh .h++ .hm
-  .hpp .hxx .in .txx
-
-
-[31m[1mCMake Error[0m at /home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel/CMakeLists.txt:61 (add_executable):
-  No SOURCES given to target: CmdVelSmoother
-
-
-CMake Generate step failed.  Build files cannot be regenerated correctly.
+[36m--[0m Generating done
+[36m--[0m Build files have been written to: /home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/build/master_thesis_kremmel

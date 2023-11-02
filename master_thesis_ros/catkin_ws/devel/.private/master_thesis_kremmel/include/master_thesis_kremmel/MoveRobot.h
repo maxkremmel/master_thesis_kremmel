@@ -40,7 +40,7 @@ template<>
 struct MD5Sum< ::master_thesis_kremmel::MoveRobot > {
   static const char* value()
   {
-    return "164463c3fac04b29fa9ab47a504dfc26";
+    return "4a28bd10bf2ad79a2c715f25c5a7ebd3";
   }
 
   static const char* value(const ::master_thesis_kremmel::MoveRobot&) { return value(); }

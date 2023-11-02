@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Site BuildName="(empty)"
+	BuildStamp="20231101-0754-Experimental"
+	Name="DESKTOP-32CVTBC"
+	Generator="ctest-3.16.3"
+	CompilerName="/usr/bin/c++"
+	CompilerVersion="9.4.0"
+	OSName="Linux"
+	Hostname="DESKTOP-32CVTBC"
+	OSRelease="5.15.90.1-microsoft-standard-WSL2"
+	OSVersion="#1 SMP Fri Jan 27 02:56:13 UTC 2023"
+	OSPlatform="x86_64"
+	Is64Bits="1"
+	VendorString="AuthenticAMD"
+	VendorID="Advanced Micro Devices"
+	FamilyID="23"
+	ModelID="8"
+	ProcessorCacheSize="512"
+	NumberOfLogicalCPU="12"
+	NumberOfPhysicalCPU="6"
+	TotalVirtualMemory="2048"
+	TotalPhysicalMemory="7911"
+	LogicalProcessorsPerPhysical="2"
+	ProcessorClockFrequency="3393.62"
+	>
+	<Testing>
+		<StartDateTime>Nov 01 17:00 CET</StartDateTime>
+		<StartTestTime>1698854453</StartTestTime>
+		<TestList/>
+		<EndDateTime>Nov 01 17:00 CET</EndDateTime>
+		<EndTestTime>1698854453</EndTestTime>
+		<ElapsedMinutes>0</ElapsedMinutes>
+	</Testing>
+</Site>

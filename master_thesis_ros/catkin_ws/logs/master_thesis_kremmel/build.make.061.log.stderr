@@ -1,0 +1,36 @@
+[01m[K/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel/src/ekfSlam.cpp:[m[K In member function ‘[01m[Kvoid EKFSlam::predict(const ConstPtr&, const PointCloud2ConstPtr&)[m[K’:
+[01m[K/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel/src/ekfSlam.cpp:172:20:[m[K [01;31m[Kerror: [m[Kcannot convert ‘[01m[Kdouble[m[K’ to ‘[01m[Kconst char*[m[K’
+  172 |             printf([01;31m[Kv[m[K);
+      |                    [01;31m[K^[m[K
+      |                    [01;31m[K|[m[K
+      |                    [01;31m[Kdouble[m[K
+In file included from [01m[K/usr/include/c++/9/cstdio:42[m[K,
+                 from [01m[K/usr/include/c++/9/ext/string_conversions.h:43[m[K,
+                 from [01m[K/usr/include/c++/9/bits/basic_string.h:6496[m[K,
+                 from [01m[K/usr/include/c++/9/string:55[m[K,
+                 from [01m[K/opt/ros/noetic/include/ros/platform.h:38[m[K,
+                 from [01m[K/opt/ros/noetic/include/ros/time.h:53[m[K,
+                 from [01m[K/opt/ros/noetic/include/ros/ros.h:38[m[K,
+                 from [01m[K/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel/src/ekfSlam.cpp:1[m[K:
+[01m[K/usr/include/stdio.h:332:43:[m[K [01;36m[Knote: [m[K  initializing argument 1 of ‘[01m[Kint printf(const char*, ...)[m[K’
+  332 | extern int printf ([01;36m[Kconst char *__restrict __format[m[K, ...);
+      |                    [01;36m[K~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~[m[K
+[01m[K/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel/src/ekfSlam.cpp:173:20:[m[K [01;31m[Kerror: [m[Kcannot convert ‘[01m[Kdouble[m[K’ to ‘[01m[Kconst char*[m[K’
+  173 |             printf([01;31m[Kw[m[K);
+      |                    [01;31m[K^[m[K
+      |                    [01;31m[K|[m[K
+      |                    [01;31m[Kdouble[m[K
+In file included from [01m[K/usr/include/c++/9/cstdio:42[m[K,
+                 from [01m[K/usr/include/c++/9/ext/string_conversions.h:43[m[K,
+                 from [01m[K/usr/include/c++/9/bits/basic_string.h:6496[m[K,
+                 from [01m[K/usr/include/c++/9/string:55[m[K,
+                 from [01m[K/opt/ros/noetic/include/ros/platform.h:38[m[K,
+                 from [01m[K/opt/ros/noetic/include/ros/time.h:53[m[K,
+                 from [01m[K/opt/ros/noetic/include/ros/ros.h:38[m[K,
+                 from [01m[K/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel/src/ekfSlam.cpp:1[m[K:
+[01m[K/usr/include/stdio.h:332:43:[m[K [01;36m[Knote: [m[K  initializing argument 1 of ‘[01m[Kint printf(const char*, ...)[m[K’
+  332 | extern int printf ([01;36m[Kconst char *__restrict __format[m[K, ...);
+      |                    [01;36m[K~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~[m[K
+make[2]: *** [CMakeFiles/EKFSlam.dir/build.make:63: CMakeFiles/EKFSlam.dir/src/ekfSlam.cpp.o] Error 1
+make[1]: *** [CMakeFiles/Makefile2:238: CMakeFiles/EKFSlam.dir/all] Error 2
+make: *** [Makefile:141: all] Error 2

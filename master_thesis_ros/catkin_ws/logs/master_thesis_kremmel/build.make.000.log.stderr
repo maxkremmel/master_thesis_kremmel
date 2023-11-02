@@ -1,0 +1,8 @@
+[01m[K/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel/src/landmarkProcessing.cpp:[m[K In member function ‘[01m[Kvoid NewLandMarkProcessing::newLandMarkCallback(const PointCloud2ConstPtr&)[m[K’:
+[01m[K/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel/src/landmarkProcessing.cpp:166:34:[m[K [01;31m[Kerror: [m[K‘[01m[Kmaster_thesis_kremmel::Landmark::Response[m[K’ {aka ‘[01m[Kstruct master_thesis_kremmel::LandmarkResponse_<std::allocator<void> >[m[K’} has no member named ‘[01m[Ksuccess[m[K’
+  166 |                 if (srv.response.[01;31m[Ksuccess[m[K)
+      |                                  [01;31m[K^~~~~~~[m[K
+make[2]: *** [CMakeFiles/LandmarkProcessor.dir/build.make:63: CMakeFiles/LandmarkProcessor.dir/src/landmarkProcessing.cpp.o] Error 1
+make[1]: *** [CMakeFiles/Makefile2:263: CMakeFiles/LandmarkProcessor.dir/all] Error 2
+make[1]: *** Waiting for unfinished jobs....
+make: *** [Makefile:141: all] Error 2

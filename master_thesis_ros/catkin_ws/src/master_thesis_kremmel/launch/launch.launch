@@ -3,14 +3,27 @@
   <arg name="file_server" default="true" />
   <arg name="teleop" default="true" />
   <arg name="joy_teleop" default="false" />
+  <arg name="myEKF" default="true" />
+  <arg name="kiss_icp" default="false" />
+  <arg name="gmapping" default="false" />
   <arg name="gui" default="false" />
   <arg name="rviz" default="true" />
-  <arg name="x_pos" default="0" />
-  <arg name="y_pos" default="0" />
+  <arg name="x_pos" default="-6.5" />
+  <arg name="y_pos" default="3.0" /><!-- -7.750 -->
   <arg name="z_pos" default="0" />
-  <arg name="yaw" default="0" />
-  <arg name="path_to_world" default="$(find master_thesis_kremmel)/worlds/test_world.world" />
+  <arg name="yaw" default="0" /><!-- 1.57 -->
+  <!-- <arg name="path_to_world" default="$(find master_thesis_kremmel)/worlds/test_world.world" /> -->
+  <arg name="path_to_world" default="$(find turtlebot3_gazebo)/worlds/turtlebot3_house.world" />
+<!-- 
 
+Test World names:
+ +  test_world_lin1
+ +  test_world_lin2
+ +  test_world_ang1
+ +  test_world_ang2
+ +  test_world
+
+ -->
   <group if="$(arg file_server)">
     <include file="$(find file_server)/launch/ros_sharp_communication.launch">
       <arg name="port" value="9090" />
@@ -22,7 +35,7 @@
     <arg name="gui" value="$(arg gui)" />
     <arg name="x_pos" value="$(arg x_pos)" />
     <arg name="y_pos" value="$(arg y_pos)" />
-    <arg name="z_pos" value="$(arg y_pos)" />
+    <arg name="z_pos" value="$(arg z_pos)" />
     <arg name="yaw" value="$(arg yaw)" />
   </include>
 
@@ -31,7 +44,9 @@
     <arg name="model" default="$(env TURTLEBOT3_MODEL)" doc="model type [burger, waffle, waffle_pi]"/>
     <param name="model" value="$(arg model)"/>
     <!-- turtlebot3_teleop_key already has its own built in velocity smoother -->
-    <node pkg="turtlebot3_teleop" type="turtlebot3_teleop_key" name="turtlebot3_teleop_keyboard"  output="screen"  launch-prefix="xterm -e"/>
+    <node pkg="turtlebot3_teleop" type="turtlebot3_teleop_key" name="turtlebot3_teleop_keyboard"  output="screen"  launch-prefix="xterm -e">
+      <remap from="cmd_vel" to="/cmd_vel_raw"/>
+    </node>
   </group>
 
   <group if="$(arg joy_teleop)">
@@ -49,8 +64,44 @@
     </node>
   </group>
 
-  <node pkg="tf2_ros" type="static_transform_publisher" name="world_to_odom"
-      args="0 0 0 0 0 0 world odom" />
+  <!-- Start KISS-ICP -->
+  <group if="$(arg kiss_icp)">
+    <include file="$(find kiss_icp)/launch/odometry.launch">
+      <arg name="visualize" default="false" />
+      <arg name="odom_frame" default="odom" />
+      <arg name="child_frame" default="base_link" />
+      <arg name="topic" default="transformed_laserscan" />
+    </include>
+  </group>
+
+  <!-- Start Gmapping -->
+  <group if="$(arg gmapping)">
+    <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="pointcloud_to_laserscan">
+      <remap from="cloud_in" to="/velodyne_points"/>
+      <remap from="scan" to="/base_scan" />
+      <rosparam>
+        target_frame: velodyne
+        transform_tolerance: 0.01
+        min_height: 0.0
+        max_height: 2.5
+        angle_min: -1.5708
+        angle_max: 1.5708
+        angle_increment: 0.0087
+        scan_time: 0.1
+        range_min: 1.0
+        range_max: 30.0
+        use_inf: true
+        concurrency_level: 1
+      </rosparam>
+    </node>
+    <node pkg="gmapping" type="slam_gmapping" name="turtlebot3_slam_gmapping">
+      <remap from="scan" to="base_scan"/>
+      <param name="base_frame" value="base_footprint"/>
+      <param name="odom_frame" value="odom"/>
+      <param name="map_frame"  value="map"/>
+      <rosparam command="load" file="$(find master_thesis_kremmel)/config/gmapping_params.yaml" />
+    </node>
+  </group>
 
   <!-- Start Rviz -->
   <group if="$(arg rviz)">
@@ -58,35 +109,30 @@
       args="-d $(find master_thesis_kremmel)/config/rviz.rviz" />
   </group>
 
-  <!-- Start Nodes -->
-  <node name="LandmarkProcessor" type="LandmarkProcessor" pkg="master_thesis_kremmel"
-    output="screen" />
-  <node name="EKFSlam" type="EKFSlam" pkg="master_thesis_kremmel" output="screen">
-    <param name="alpha1" value="0.1" />
-    <param name="alpha2" value="0.0" />
-    <param name="alpha3" value="0.001" />
-    <param name="alpha4" value="0.1" />
-  </node>
+  <!-- Start implemented EKF -->
+  <group if="$(arg myEKF)">
+    <node pkg="tf2_ros" type="static_transform_publisher" name="world_to_odom" args="0 0 0 0 0 0 world odom" />
 
-  <!-- PS4 Controller arguments -->
-  <!-- <arg name="addr" default="84:30:95:1B:29:26" />
-  <arg name="use_standard_msgs" default="true" />
-  <arg name="autorepeat_rate" default="0" if="$(arg use_standard_msgs)" /> -->
-
-  <!-- Start DualShock4 Node -->
-  <!-- <group if="$(arg joy_teleop)">
-    <node pkg="ds4_driver" type="ds4_driver_node.py" name="ds4_driver" output="screen">
-      <rosparam command="load" file="$(find ds4_driver)/config/params.yaml" />
-      <param name="device_addr" value="$(arg addr)" />
-      <param name="use_standard_msgs" value="$(arg use_standard_msgs)" />
-      <param name="autorepeat_rate" value="$(arg autorepeat_rate)" if="$(arg use_standard_msgs)" />
+    <node name="LandmarkProcessor" type="LandmarkProcessor" pkg="master_thesis_kremmel" output="screen" />
+      <node name="EKFSlam" type="EKFSlam" pkg="master_thesis_kremmel" output="screen">
+      <param name="x_pos" value="$(arg x_pos)" />
+      <param name="y_pos" value="$(arg y_pos)" />
+      <param name="yaw" value="$(arg yaw)" />
+      <param name="robotBase" value="0.287" />
+      <param name="robotWheelRadius" value="0.033" />
+      <param name="fitnessScoreThreshhold" value="0.008" />
+      <param name="maxNumLandmarks" value="30" />
     </node>
-  </group> -->
+  </group>
 
-  <!-- Start Controller -->
-  <!-- <include file="$(find taurob_tracker_control)/launch/taurob_tracker_control.launch" /> -->
+  <!-- Transform laserscan for Kiss ICP -->
+  <group if="$(arg kiss_icp)">
+    <node name="TransformLaserScan" type="TransformLaserScan" pkg="master_thesis_kremmel" output="screen" />
+  </group>
 
-  <!-- <node name="Evaluator" type="Evaluator" pkg="master_thesis_kremmel" output="screen" /> -->
-  <!-- <node name="CmdVelSmoother" type="CmdVelSmoother" pkg="master_thesis_kremmel" output="screen" /> -->
-  <!-- <node name="PredictionTest" type="PredictionTest" pkg="master_thesis_kremmel" output="screen" /> -->
+  <!-- Start node that stores data to csv file -->
+  <node name="Evaluator" type="Evaluator" pkg="master_thesis_kremmel" output="screen" />
+
+  <!-- Start node that smoothes cmd_vel -->
+  <node name="CmdVelSmoother" type="CmdVelSmoother" pkg="master_thesis_kremmel" output="screen" />
 </launch>

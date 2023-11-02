@@ -99,12 +99,12 @@ public:
         float y_mean = 0;
         float z_mean = 0;
         json lm_pointcloud;
-        for (pcl::PointCloud<pcl::PointXYZ>::iterator it = pcl_cloud->begin(); it != pcl_cloud->end(); it++)
+        for (pcl::PointCloud<pcl::PointXYZ>::iterator it = pcl_cloud->begin(); it < pcl_cloud->end();)
         {
-            if (it->z < 0.1)
+            if (it->z < 0.05)
             {
                 // Skip this point because its part of the floor
-                it = pcl_cloud->erase(it); // ToDo: Funktioniert nicht
+                pcl_cloud->erase(it);
             }
             else
             {
@@ -114,6 +114,7 @@ public:
 
                 json point = {it->x, it->y, it->z};
                 lm_pointcloud.push_back(point);
+                it++;
             }
 
             // ToDo: Eventuell noch Punktwolke komprimieren

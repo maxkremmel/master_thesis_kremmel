@@ -131,14 +131,13 @@ import struct
 
 
 class MoveRobotResponse(genpy.Message):
-  _md5sum = "358e233cde0c8a8bcfea4ce193f8fc15"
+  _md5sum = "d41d8cd98f00b204e9800998ecf8427e"
   _type = "master_thesis_kremmel/MoveRobotResponse"
   _has_header = False  # flag to mark the presence of a Header object
-  _full_text = """bool success
-
+  _full_text = """
 """
-  __slots__ = ['success']
-  _slot_types = ['bool']
+  __slots__ = []
+  _slot_types = []
 
   def __init__(self, *args, **kwds):
     """
@@ -148,7 +147,7 @@ class MoveRobotResponse(genpy.Message):
     changes.  You cannot mix in-order arguments and keyword arguments.
 
     The available fields are:
-       success
+       
 
     :param args: complete set of field values, in .msg order
     :param kwds: use keyword arguments corresponding to message field names
@@ -156,11 +155,6 @@ class MoveRobotResponse(genpy.Message):
     """
     if args or kwds:
       super(MoveRobotResponse, self).__init__(*args, **kwds)
-      # message fields cannot be None, assign default values for those that are
-      if self.success is None:
-        self.success = False
-    else:
-      self.success = False
 
   def _get_types(self):
     """
@@ -174,8 +168,7 @@ class MoveRobotResponse(genpy.Message):
     :param buff: buffer, ``StringIO``
     """
     try:
-      _x = self.success
-      buff.write(_get_struct_B().pack(_x))
+      pass
     except struct.error as se: self._check_types(struct.error("%s: '%s' when writing '%s'" % (type(se), str(se), str(locals().get('_x', self)))))
     except TypeError as te: self._check_types(ValueError("%s: '%s' when writing '%s'" % (type(te), str(te), str(locals().get('_x', self)))))
 
@@ -188,10 +181,6 @@ class MoveRobotResponse(genpy.Message):
       codecs.lookup_error("rosmsg").msg_type = self._type
     try:
       end = 0
-      start = end
-      end += 1
-      (self.success,) = _get_struct_B().unpack(str[start:end])
-      self.success = bool(self.success)
       return self
     except struct.error as e:
       raise genpy.DeserializationError(e)  # most likely buffer underfill
@@ -204,8 +193,7 @@ class MoveRobotResponse(genpy.Message):
     :param numpy: numpy python module
     """
     try:
-      _x = self.success
-      buff.write(_get_struct_B().pack(_x))
+      pass
     except struct.error as se: self._check_types(struct.error("%s: '%s' when writing '%s'" % (type(se), str(se), str(locals().get('_x', self)))))
     except TypeError as te: self._check_types(ValueError("%s: '%s' when writing '%s'" % (type(te), str(te), str(locals().get('_x', self)))))
 
@@ -219,10 +207,6 @@ class MoveRobotResponse(genpy.Message):
       codecs.lookup_error("rosmsg").msg_type = self._type
     try:
       end = 0
-      start = end
-      end += 1
-      (self.success,) = _get_struct_B().unpack(str[start:end])
-      self.success = bool(self.success)
       return self
     except struct.error as e:
       raise genpy.DeserializationError(e)  # most likely buffer underfill
@@ -231,14 +215,8 @@ _struct_I = genpy.struct_I
 def _get_struct_I():
     global _struct_I
     return _struct_I
-_struct_B = None
-def _get_struct_B():
-    global _struct_B
-    if _struct_B is None:
-        _struct_B = struct.Struct("<B")
-    return _struct_B
 class MoveRobot(object):
   _type          = 'master_thesis_kremmel/MoveRobot'
-  _md5sum = '164463c3fac04b29fa9ab47a504dfc26'
+  _md5sum = '4a28bd10bf2ad79a2c715f25c5a7ebd3'
   _request_class  = MoveRobotRequest
   _response_class = MoveRobotResponse

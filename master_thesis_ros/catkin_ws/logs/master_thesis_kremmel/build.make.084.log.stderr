@@ -1,7 +1,0 @@
-[01m[K/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel/src/ekfSlam.cpp:[m[K In member function ‘[01m[Kvoid EKFSlam::correct(const PointCloud2ConstPtr&)[m[K’:
-[01m[K/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel/src/ekfSlam.cpp:263:65:[m[K [01;31m[Kerror: [m[Kexpected primary-expression before ‘[01m[K/[m[K’ token
-  263 |                     state_vector(2) = state_vector_last(2); */ *[01;31m[K/[m[K
-      |                                                                 [01;31m[K^[m[K
-make[2]: *** [CMakeFiles/EKFSlam.dir/build.make:63: CMakeFiles/EKFSlam.dir/src/ekfSlam.cpp.o] Error 1
-make[1]: *** [CMakeFiles/Makefile2:236: CMakeFiles/EKFSlam.dir/all] Error 2
-make: *** [Makefile:141: all] Error 2

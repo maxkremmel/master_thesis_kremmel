@@ -118,10 +118,10 @@
   "master_thesis_kremmel/MoveRobotRequest")
 (cl:defmethod roslisp-msg-protocol:md5sum ((type (cl:eql '<MoveRobot-request>)))
   "Returns md5sum for a message object of type '<MoveRobot-request>"
-  "164463c3fac04b29fa9ab47a504dfc26")
+  "4a28bd10bf2ad79a2c715f25c5a7ebd3")
 (cl:defmethod roslisp-msg-protocol:md5sum ((type (cl:eql 'MoveRobot-request)))
   "Returns md5sum for a message object of type 'MoveRobot-request"
-  "164463c3fac04b29fa9ab47a504dfc26")
+  "4a28bd10bf2ad79a2c715f25c5a7ebd3")
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql '<MoveRobot-request>)))
   "Returns full string definition for message of type '<MoveRobot-request>"
   (cl:format cl:nil "float64 x~%float64 y~%float64 t~%~%~%"))
@@ -144,11 +144,7 @@
 ;//! \htmlinclude MoveRobot-response.msg.html
 
 (cl:defclass <MoveRobot-response> (roslisp-msg-protocol:ros-message)
-  ((success
-    :reader success
-    :initarg :success
-    :type cl:boolean
-    :initform cl:nil))
+  ()
 )
 
 (cl:defclass MoveRobot-response (<MoveRobot-response>)
@@ -158,18 +154,11 @@
   (cl:declare (cl:ignorable args))
   (cl:unless (cl:typep m 'MoveRobot-response)
     (roslisp-msg-protocol:msg-deprecation-warning "using old message class name master_thesis_kremmel-srv:<MoveRobot-response> is deprecated: use master_thesis_kremmel-srv:MoveRobot-response instead.")))
-
-(cl:ensure-generic-function 'success-val :lambda-list '(m))
-(cl:defmethod success-val ((m <MoveRobot-response>))
-  (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader master_thesis_kremmel-srv:success-val is deprecated.  Use master_thesis_kremmel-srv:success instead.")
-  (success m))
 (cl:defmethod roslisp-msg-protocol:serialize ((msg <MoveRobot-response>) ostream)
   "Serializes a message object of type '<MoveRobot-response>"
-  (cl:write-byte (cl:ldb (cl:byte 8 0) (cl:if (cl:slot-value msg 'success) 1 0)) ostream)
 )
 (cl:defmethod roslisp-msg-protocol:deserialize ((msg <MoveRobot-response>) istream)
   "Deserializes a message object of type '<MoveRobot-response>"
-    (cl:setf (cl:slot-value msg 'success) (cl:not (cl:zerop (cl:read-byte istream))))
   msg
 )
 (cl:defmethod roslisp-msg-protocol:ros-datatype ((msg (cl:eql '<MoveRobot-response>)))
@@ -180,24 +169,22 @@
   "master_thesis_kremmel/MoveRobotResponse")
 (cl:defmethod roslisp-msg-protocol:md5sum ((type (cl:eql '<MoveRobot-response>)))
   "Returns md5sum for a message object of type '<MoveRobot-response>"
-  "164463c3fac04b29fa9ab47a504dfc26")
+  "4a28bd10bf2ad79a2c715f25c5a7ebd3")
 (cl:defmethod roslisp-msg-protocol:md5sum ((type (cl:eql 'MoveRobot-response)))
   "Returns md5sum for a message object of type 'MoveRobot-response"
-  "164463c3fac04b29fa9ab47a504dfc26")
+  "4a28bd10bf2ad79a2c715f25c5a7ebd3")
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql '<MoveRobot-response>)))
   "Returns full string definition for message of type '<MoveRobot-response>"
-  (cl:format cl:nil "bool success~%~%~%~%"))
+  (cl:format cl:nil "~%~%~%"))
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql 'MoveRobot-response)))
   "Returns full string definition for message of type 'MoveRobot-response"
-  (cl:format cl:nil "bool success~%~%~%~%"))
+  (cl:format cl:nil "~%~%~%"))
 (cl:defmethod roslisp-msg-protocol:serialization-length ((msg <MoveRobot-response>))
   (cl:+ 0
-     1
 ))
 (cl:defmethod roslisp-msg-protocol:ros-message-to-list ((msg <MoveRobot-response>))
   "Converts a ROS message object to a list"
   (cl:list 'MoveRobot-response
-    (cl:cons ':success (success msg))
 ))
 (cl:defmethod roslisp-msg-protocol:service-request-type ((msg (cl:eql 'MoveRobot)))
   'MoveRobot-request)

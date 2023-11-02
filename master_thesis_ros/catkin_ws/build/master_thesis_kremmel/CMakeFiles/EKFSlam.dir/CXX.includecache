@@ -95,6 +95,8 @@ ros/package.h
 -
 geometry_msgs/Point.h
 -
+geometry_msgs/Twist.h
+-
 sensor_msgs/PointCloud2.h
 -
 sensor_msgs/JointState.h

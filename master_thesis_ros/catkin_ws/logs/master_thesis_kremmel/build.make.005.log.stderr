@@ -1,0 +1,7 @@
+[01m[K/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel/src/ekfSlam.cpp:[m[K In member function ‘[01m[Kbool EKFSlam::moveCurrentStateCallback(master_thesis_kremmel::MoveRobot::Request&, master_thesis_kremmel::MoveRobot::Response&)[m[K’:
+[01m[K/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/master_thesis_kremmel/src/ekfSlam.cpp:380:13:[m[K [01;31m[Kerror: [m[K‘[01m[Kmaster_thesis_kremmel::MoveRobot::Response[m[K’ {aka ‘[01m[Kstruct master_thesis_kremmel::MoveRobotResponse_<std::allocator<void> >[m[K’} has no member named ‘[01m[Ksuccess[m[K’
+  380 |         res.[01;31m[Ksuccess[m[K = true;
+      |             [01;31m[K^~~~~~~[m[K
+make[2]: *** [CMakeFiles/EKFSlam.dir/build.make:63: CMakeFiles/EKFSlam.dir/src/ekfSlam.cpp.o] Error 1
+make[1]: *** [CMakeFiles/Makefile2:236: CMakeFiles/EKFSlam.dir/all] Error 2
+make: *** [Makefile:141: all] Error 2
