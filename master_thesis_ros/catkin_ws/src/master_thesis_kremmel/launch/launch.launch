@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
   <arg name="file_server" default="true" />
-  <arg name="teleop" default="true" />
+  <arg name="teleop" default="false" />
   <arg name="joy_teleop" default="false" />
   <arg name="myEKF" default="true" />
   <arg name="kiss_icp" default="false" />

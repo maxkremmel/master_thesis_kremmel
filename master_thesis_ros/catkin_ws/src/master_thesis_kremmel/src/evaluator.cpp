@@ -24,7 +24,7 @@ public:
         sync->registerCallback(boost::bind(&Evaluator::callback, this, _1, _2, _3, _4)); // Zuweisen des synchronisierten Callbacks
 
         std::string packagePath = ros::package::getPath("master_thesis_kremmel");
-        std::string csvPath = packagePath + "/data/results.csv";
+        std::string csvPath = packagePath + "/results/results.csv";
 
         results.open(csvPath);
         results << std::fixed; // avoid scientific notation of values

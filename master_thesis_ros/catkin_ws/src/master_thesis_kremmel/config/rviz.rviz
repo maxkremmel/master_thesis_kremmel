@@ -10,7 +10,7 @@ Panels:
         - /Ellipses1/Namespaces1
         - /Wheel Odometry1/Shape1
       Splitter Ratio: 0.5314685106277466
-    Tree Height: 1153
+    Tree Height: 824
   - Class: rviz/Selection
     Name: Selection
   - Class: rviz/Tool Properties
@@ -28,7 +28,7 @@ Panels:
   - Class: rviz/Time
     Name: Time
     SyncMode: 0
-    SyncSource: Laserscan
+    SyncSource: ""
 Preferences:
   PromptSaveOnExit: true
 Toolbars:
@@ -61,26 +61,8 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: false
-        base_footprint:
-          Value: true
-        base_link:
-          Value: false
-        caster_back_left_link:
-          Value: false
-        caster_back_right_link:
-          Value: false
-        imu_link:
-          Value: false
         odom:
           Value: true
-        velodyne:
-          Value: true
-        velodyne_base_link:
-          Value: false
-        wheel_left_link:
-          Value: false
-        wheel_right_link:
-          Value: false
         world:
           Value: true
       Marker Alpha: 1
@@ -92,21 +74,7 @@ Visualization Manager:
       Tree:
         world:
           odom:
-            base_footprint:
-              base_link:
-                caster_back_left_link:
-                  {}
-                caster_back_right_link:
-                  {}
-                imu_link:
-                  {}
-                velodyne_base_link:
-                  velodyne:
-                    {}
-                wheel_left_link:
-                  {}
-                wheel_right_link:
-                  {}
+            {}
       Update Interval: 0
       Value: true
     - Alpha: 0.800000011920929
@@ -203,8 +171,7 @@ Visualization Manager:
       Marker Topic: /ekf_slam/current_state_marker
       Name: Ellipses
       Namespaces:
-        lm estimates: true
-        pose estimate: true
+        {}
       Queue Size: 100
       Value: true
     - Alpha: 1
@@ -268,7 +235,7 @@ Visualization Manager:
       Marker Topic: /ekf_slam/predicted_meas
       Name: Predicted Measurement
       Namespaces:
-        predicted_measurement: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -276,7 +243,7 @@ Visualization Manager:
       Marker Topic: /ekf_slam/measured_lm_pose
       Name: LM Poses
       Namespaces:
-        measured_landmark_pose: true
+        {}
       Queue Size: 100
       Value: true
     - Angle Tolerance: 0.10000000149011612
@@ -450,7 +417,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/XYOrbit
-      Distance: 15.182306289672852
+      Distance: 13.168039321899414
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -458,25 +425,25 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: -6.340927600860596
-        Y: 0.8487178087234497
+        X: -5.372025966644287
+        Y: -0.14111173152923584
         Z: 8.344650268554688e-07
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.4247961044311523
+      Pitch: 1.409796118736267
       Target Frame: <Fixed Frame>
-      Yaw: 3.145399808883667
+      Yaw: 3.140399694442749
     Saved: ~
 Window Geometry:
   Displays:
     collapsed: false
-  Height: 1376
+  Height: 1047
   Hide Left Dock: false
   Hide Right Dock: false
-  QMainWindow State: 000000ff00000000fd00000004000000000000019f0000050afc0200000008fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000003b0000050a000000c700fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261000000010000010f0000050afc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073000000003b0000050a000000a000fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e100000197000000030000069d0000003efc0100000002fb0000000800540069006d006500000000000000069d0000035c00fffffffb0000000800540069006d00650100000000000004500000000000000000000004f80000050a00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd00000004000000000000019f000003c1fc0200000008fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000003b000003c1000000c700fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261000000010000010f0000050afc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073000000003b0000050a000000a000fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e100000197000000030000069d0000003efc0100000002fb0000000800540069006d006500000000000000069d0000035c00fffffffb0000000800540069006d00650100000000000004500000000000000000000005cf000003c100000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Selection:
     collapsed: false
   Time:
@@ -485,6 +452,6 @@ Window Geometry:
     collapsed: false
   Views:
     collapsed: false
-  Width: 1693
-  X: 462
-  Y: -31
+  Width: 1908
+  X: -32
+  Y: -32
