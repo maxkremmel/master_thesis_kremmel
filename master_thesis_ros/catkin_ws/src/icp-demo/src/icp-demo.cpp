@@ -124,22 +124,27 @@ int main(int argc, char *argv[])
     viewer.createViewPort(0.5, 0.0, 1.0, 1.0, v2);
 
     // The color we will be using
-    float bckgr_gray_level = 0.0; // Black
+    float bckgr_gray_level = 1.0; // Black
     float txt_gray_lvl = 1.0 - bckgr_gray_level;
 
     // Original point cloud is white
-    pcl::visualization::PointCloudColorHandlerCustom<PointT> cloud_in_color_h(cloud_in, (int)255 * txt_gray_lvl, (int)255 * txt_gray_lvl,
-                                                                              (int)255 * txt_gray_lvl);
+    pcl::visualization::PointCloudColorHandlerCustom<PointT> cloud_in_color_h(cloud_in, (int)0 * txt_gray_lvl, (int)0 * txt_gray_lvl,
+                                                                              (int)0 * txt_gray_lvl);
     viewer.addPointCloud(cloud_in, cloud_in_color_h, "cloud_in_v1", v1);
     viewer.addPointCloud(cloud_in, cloud_in_color_h, "cloud_in_v2", v2);
 
     // Transformed point cloud is green
-    pcl::visualization::PointCloudColorHandlerCustom<PointT> cloud_tr_color_h(cloud_tr, 20, 180, 20);
+    pcl::visualization::PointCloudColorHandlerCustom<PointT> cloud_tr_color_h(cloud_tr, 10, 160, 10);
     viewer.addPointCloud(cloud_tr, cloud_tr_color_h, "cloud_tr_v1", v1);
 
     // ICP aligned point cloud is red
     pcl::visualization::PointCloudColorHandlerCustom<PointT> cloud_icp_color_h(cloud_icp, 180, 20, 20);
     viewer.addPointCloud(cloud_icp, cloud_icp_color_h, "cloud_icp_v2", v2);
+
+    viewer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "cloud_in_v1");
+    viewer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "cloud_in_v2");
+    viewer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "cloud_tr_v1");
+    viewer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "cloud_icp_v2");
 
     // Adding text descriptions in each viewport
     viewer.addText("White: Original point cloud\nGreen: Matrix transformed point cloud", 10, 15, 16, txt_gray_lvl, txt_gray_lvl, txt_gray_lvl, "icp_info_1", v1);
