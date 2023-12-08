@@ -1,0 +1,15 @@
+(cl:defpackage master_thesis_kremmel-srv
+  (:use )
+  (:export
+   "LANDMARK"
+   "<LANDMARK-REQUEST>"
+   "LANDMARK-REQUEST"
+   "<LANDMARK-RESPONSE>"
+   "LANDMARK-RESPONSE"
+   "MOVEROBOT"
+   "<MOVEROBOT-REQUEST>"
+   "MOVEROBOT-REQUEST"
+   "<MOVEROBOT-RESPONSE>"
+   "MOVEROBOT-RESPONSE"
+  ))
+

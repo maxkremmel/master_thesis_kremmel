@@ -1,0 +1,8 @@
+prefix=/home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/install
+
+Name: turtlebot3_vlp16_description
+Description: Description of turtlebot3_vlp16_description
+Version: 1.2.6
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: urdf xacro

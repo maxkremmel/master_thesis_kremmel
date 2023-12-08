@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Start icp demp -->
+  <node name="ICPdemo" type="ICPdemo" pkg="icp-demo" output="screen" />
+</launch>

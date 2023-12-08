@@ -1,0 +1,10 @@
+** WARNING ** io features related to pcap will be disabled
+** WARNING ** io features related to png will be disabled
+** WARNING ** io features related to libusb-1.0 will be disabled
+[31m[1mCMake Error[0m at /opt/ros/noetic/share/genmsg/cmake/genmsg-extras.cmake:151 (message):
+  add_service_files() directory not found:
+  /home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/src/icp-demo/srv
+[36mCall Stack (most recent call first):[0m
+  CMakeLists.txt:16 (add_service_files)
+
+

@@ -1,0 +1,4 @@
+[35m[1mScanning dependencies of target ICPdemo[0m
+[ 50%] [32mBuilding CXX object CMakeFiles/ICPdemo.dir/src/icp-demo.cpp.o[0m
+[100%] [32m[1mLinking CXX executable /home/max/master_thesis_kremmel/master_thesis_ros/catkin_ws/devel/.private/icp-demo/lib/icp-demo/ICPdemo[0m
+[100%] Built target ICPdemo

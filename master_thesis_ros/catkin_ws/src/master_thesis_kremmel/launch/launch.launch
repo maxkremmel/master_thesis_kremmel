@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <launch>
   <arg name="file_server" default="true" />
-  <arg name="teleop" default="false" />
+  <arg name="teleop" default="true" />
   <arg name="joy_teleop" default="false" />
   <arg name="myEKF" default="true" />
   <arg name="kiss_icp" default="false" />
-  <arg name="gmapping" default="false" />
+  <arg name="lio-sam" default="false" />
   <arg name="gui" default="false" />
   <arg name="rviz" default="true" />
   <arg name="x_pos" default="-6.5" />
@@ -72,35 +72,6 @@ Test World names:
       <arg name="child_frame" default="base_link" />
       <arg name="topic" default="transformed_laserscan" />
     </include>
-  </group>
-
-  <!-- Start Gmapping -->
-  <group if="$(arg gmapping)">
-    <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="pointcloud_to_laserscan">
-      <remap from="cloud_in" to="/velodyne_points"/>
-      <remap from="scan" to="/base_scan" />
-      <rosparam>
-        target_frame: velodyne
-        transform_tolerance: 0.01
-        min_height: 0.0
-        max_height: 2.5
-        angle_min: -1.5708
-        angle_max: 1.5708
-        angle_increment: 0.0087
-        scan_time: 0.1
-        range_min: 1.0
-        range_max: 30.0
-        use_inf: true
-        concurrency_level: 1
-      </rosparam>
-    </node>
-    <node pkg="gmapping" type="slam_gmapping" name="turtlebot3_slam_gmapping">
-      <remap from="scan" to="base_scan"/>
-      <param name="base_frame" value="base_footprint"/>
-      <param name="odom_frame" value="odom"/>
-      <param name="map_frame"  value="map"/>
-      <rosparam command="load" file="$(find master_thesis_kremmel)/config/gmapping_params.yaml" />
-    </node>
   </group>
 
   <!-- Start Rviz -->
