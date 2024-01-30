@@ -4,6 +4,7 @@
 #include <geometry_msgs/Twist.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <sensor_msgs/JointState.h>
+#include <std_msgs/Header.h>
 #include <nav_msgs/Odometry.h>
 #include <tf/transform_broadcaster.h>
 #include <tf2_ros/transform_listener.h>
@@ -14,10 +15,13 @@
 #include <message_filters/time_synchronizer.h>
 #include <message_filters/sync_policies/approximate_time.h>
 #include <pcl/point_types.h>
+#include <pcl/filters/voxel_grid.h>
+#include <pcl/filters/crop_box.h>
 #include <pcl/registration/icp.h>
 #include <pcl_conversions/pcl_conversions.h>
 #include <Eigen/Dense>
 #include "json.hpp"
+#include <string>
 #include <master_thesis_kremmel/Landmark.h>
 #include <master_thesis_kremmel/MoveRobot.h>
 
@@ -33,6 +37,7 @@ public:
 
         storedLandmarksPublisher = n.advertise<sensor_msgs::PointCloud2>("ekf_slam/stored_landmarks", 1);
         convergedLandmarksPublisher = n.advertise<sensor_msgs::PointCloud2>("ekf_slam/converged_landmarks", 1);
+        reducedLasercanPublisher = n.advertise<sensor_msgs::PointCloud2>("ekf_slam/reduced_laserscan", 1);
         covEllipseMsgPublisher = n.advertise<visualization_msgs::Marker>("/ekf_slam/current_state_marker", 1);
         predictedMeasPublisher = n.advertise<visualization_msgs::Marker>("/ekf_slam/predicted_meas", 1);
         currentStatePublisher = n.advertise<nav_msgs::Odometry>("/ekf_slam/current_state", 1);
@@ -53,6 +58,7 @@ public:
         ros::param::get("/EKFSlam/robotWheelRadius", robotWheelRadius);
         ros::param::get("/EKFSlam/fitnessScoreThreshhold", fitnessScoreThreshhold);
         ros::param::get("/EKFSlam/maxNumLandmarks", NUM_LM);
+        ros::param::get("/EKFSlam/reduceLaserscan", reduceLaserscan);
 
         // Initialisierung des EKF
         EPS = 1e-4;
@@ -66,8 +72,6 @@ public:
         ros::param::get("/EKFSlam/x_pos", state_vector(0));
         ros::param::get("/EKFSlam/y_pos", state_vector(1));
         ros::param::get("/EKFSlam/yaw", state_vector(2));
-        state_vector_last.resize(DIMsize);
-        state_vector_last.setZero();
         state_vector_wheel_odom.setZero();
         state_vector_wheel_odom = state_vector.head(3);
 
@@ -126,7 +130,7 @@ public:
 
         double v = (vr + vl) / 2;         // Berechnung der Geschwindigkeit des Roboters in seiner x-Richtung
         double w = (vr - vl) / robotBase; // Berechnung der Winkelgeschwindigkeit um seine z-Achse
-        double theta = state_vector_last(2);
+        double theta = state_vector(2);
 
         Eigen::Vector3d newMovement;
         newMovement.setZero();
@@ -151,16 +155,30 @@ public:
         }
 
         state_vector.head(3) += newMovement;
-        state_vector_wheel_odom += newMovement;
 
-        nav_msgs::Odometry currentWheelOdometry;
-        currentWheelOdometry.pose.pose.position.x = state_vector_wheel_odom(0);
-        currentWheelOdometry.pose.pose.position.y = state_vector_wheel_odom(1);
-        currentWheelOdometry.pose.pose.orientation = tf2::toMsg(getQuat(state_vector_wheel_odom(2)));
-        currentWheelOdometry.child_frame_id = "base_footprint";
-        currentWheelOdometry.header.frame_id = "odom";
-        currentWheelOdometry.header.stamp = jointStates->header.stamp;
-        wheelOdometryPublisher.publish(currentWheelOdometry);
+        theta = state_vector_wheel_odom(2);
+        newMovement.setZero();
+
+        if (abs(w) > EPS) // Verhindern von Division durch 0 bzw. fast 0
+        {
+            newMovement(0) = -(v / w) * sin(theta) + (v / w) * sin(theta + w * dt);
+            newMovement(1) = +(v / w) * cos(theta) - (v / w) * cos(theta + w * dt);
+            newMovement(2) = w * dt;
+
+            G(0, 2) = -(v / w) * cos(theta) + (v / w) * cos(theta + w * dt);
+            G(1, 2) = -(v / w) * sin(theta) + (v / w) * sin(theta + w * dt);
+        }
+        else
+        {
+            newMovement(0) = cos(theta) * v * dt;
+            newMovement(1) = sin(theta) * v * dt;
+
+            // D'Hospital Regel angewendet um numerische Fehler (Division durch Null) zu vermeiden
+            G(0, 2) = -v * sin(theta) * dt;
+            G(1, 2) = v * cos(theta) * dt;
+        }
+        state_vector_wheel_odom += newMovement;
+        publishWheelOdometry(jointStates->header.stamp);
 
         Eigen::Matrix<double, 3, 3> R = Eigen::Matrix<double, 3, 3>::Zero();
         R(0, 0) = 0.01;
@@ -168,14 +186,14 @@ public:
         R(2, 2) = 0.01;
         Cov = G * Cov * G.transpose();
         Cov.block(0, 0, 3, 3) += R;
-
+        // Variables used to log the performance of the algorithm
         numberOfDetectedLandmarks = 0;
         meanFitnessScore = 0;
+        pointsToProcessByICP = 0;
+        ICPexecutionTime = 0;
         correct(new_laserscan_msg);
         meanFitnessScore /= numberOfDetectedLandmarks;
-
-        state_vector_last = state_vector; // Aktuellen Zustandsvektor in state_vector_last zwischenspeichern
-
+        numberOfDetectedLandmarksLast = numberOfDetectedLandmarks;
         nav_msgs::Odometry velAndNumOfLmMsg;
 
         velAndNumOfLmMsg.header = jointStates->header;
@@ -183,6 +201,8 @@ public:
         velAndNumOfLmMsg.twist.twist.angular.z = w;
         velAndNumOfLmMsg.pose.pose.position.x = numberOfDetectedLandmarks;
         velAndNumOfLmMsg.pose.pose.position.y = meanFitnessScore;
+        velAndNumOfLmMsg.pose.pose.position.z = pointsToProcessByICP;
+        velAndNumOfLmMsg.pose.pose.orientation.x = ICPexecutionTime;
         velocityPublisher.publish(velAndNumOfLmMsg);
 
         publishEllipses();
@@ -196,6 +216,8 @@ public:
 
         pcl::PointCloud<pcl::PointXYZ>::Ptr storedLMs(new pcl::PointCloud<pcl::PointXYZ>);
         pcl::PointCloud<pcl::PointXYZ>::Ptr convergedLMs(new pcl::PointCloud<pcl::PointXYZ>);
+        pcl::PointCloud<pcl::PointXYZ>::Ptr reducedLaserscan(new pcl::PointCloud<pcl::PointXYZ>);
+
         // for-Schleife durch alle gespeicherten LM's
         int cov_index = 0;
         Eigen::MatrixXd H_i;
@@ -203,7 +225,9 @@ public:
         H_i.setZero();
 
         predictedMeas.points.clear();
-        measuredLMpose.points.clear();
+
+        Eigen::VectorXd state_vector_last = state_vector;
+        Eigen::MatrixXd Cov_last = Cov;
 
         for (int i = 0; i < numberOfStoredLandmarks; i++)
         {
@@ -213,7 +237,7 @@ public:
             delta(1) = state_vector(cov_index + 1) - state_vector(1);
             double q = delta.transpose() * delta; // Euklidische Distanz
             // If stored LM is closer than 4 m...
-            if (sqrt(q) < 4)
+            if (sqrt(q) < 3)
             {
                 Eigen::Vector2d predictedMeasurment;
                 predictedMeasurment(0) = sqrt(q);
@@ -231,50 +255,58 @@ public:
                 H_i(0, cov_index + 1) = H_low(0, 4);
                 H_i(1, cov_index) = H_low(1, 3);
                 H_i(1, cov_index + 1) = H_low(1, 4);
+                // Reset Q default values
+                Q << std::numeric_limits<double>::infinity(), 0,
+                    0, std::numeric_limits<double>::infinity();
+                // calculate actual range bearing measurement of LM throug ICP matching of laser scan and stored LM point clouds
+                Eigen::Vector2d actualMeasurement = searchLMmatches(pcl_laserscan, convergedLMs, reducedLaserscan, i);
                 // Kalman Gain berechnen
                 Eigen::MatrixXd K = Cov * H_i.transpose() * (H_i * Cov * H_i.transpose() + Q).inverse();
-                // calculate actual range bearing measurement of LM throug ICP matching of laser scan and stored LM point clouds
-                Eigen::Vector2d actualMeasurement = searchLMmatches(pcl_laserscan, convergedLMs, i);
-
-                if (actualMeasurement(0) != -1)
-                {
-                    numberOfDetectedLandmarks++;
-                    Eigen::MatrixXd d = (actualMeasurement - predictedMeasurment);
-                    d(1) = constrain_angle(d(1));
-                    state_vector = state_vector + K * d;
-                    Cov = (Eigen::MatrixXd::Identity(Cov.rows(), Cov.rows()) - K * H_i) * Cov; // Cov updaten
-                }
-                else
-                {
-                    // skip the update step
-                }
+                Eigen::MatrixXd d = (actualMeasurement - predictedMeasurment);
+                d(1) = constrain_angle(d(1));
+                state_vector = state_vector + K * d;
+                Cov = (Eigen::MatrixXd::Identity(Cov.rows(), Cov.rows()) - K * H_i) * Cov; // Cov updaten
             }
+
             *storedLMs += stored_landmarks[i].pointcloud;
+        }
+
+        if (numberOfDetectedLandmarks < 2)
+        {
+            // ignore correction when fewer than 2 landmarks are detected
+            state_vector = state_vector_last;
+            Cov = Cov_last;
         }
 
         // Publish predicted and actual measurement
         predictedMeasPublisher.publish(predictedMeas);
-        measuredLMposePublisher.publish(measuredLMpose);
 
         sensor_msgs::PointCloud2 ros_stored_landmarks;
         sensor_msgs::PointCloud2 ros_converged_landmarks;
+        sensor_msgs::PointCloud2 ros_reduced_laserscan;
         pcl::toROSMsg(*storedLMs.get(), ros_stored_landmarks);
         pcl::toROSMsg(*convergedLMs.get(), ros_converged_landmarks);
+        pcl::toROSMsg(*reducedLaserscan.get(), ros_reduced_laserscan);
+
         ros_stored_landmarks.header.stamp = ros::Time::now();
         ros_stored_landmarks.header.frame_id = "odom";
         ros_converged_landmarks.header.stamp = ros::Time::now();
         ros_converged_landmarks.header.frame_id = "velodyne";
+        ros_reduced_laserscan.header.stamp = ros::Time::now();
+        ros_reduced_laserscan.header.frame_id = "velodyne";
         storedLandmarksPublisher.publish(ros_stored_landmarks);
         convergedLandmarksPublisher.publish(ros_converged_landmarks);
+        reducedLasercanPublisher.publish(ros_reduced_laserscan);
     }
 
-    Eigen::Vector2d searchLMmatches(pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_laserscan, pcl::PointCloud<pcl::PointXYZ>::Ptr convergedLMs, int i)
+    Eigen::Vector2d searchLMmatches(pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_laserscan, pcl::PointCloud<pcl::PointXYZ>::Ptr convergedLMs, pcl::PointCloud<pcl::PointXYZ>::Ptr reducedLaserscan, int i)
     {
         int cov_index = 3 + 2 * i;
-        pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_landmark_target(new pcl::PointCloud<pcl::PointXYZ>);
+        pcl::PointCloud<pcl::PointXYZ>::Ptr landmark_target(new pcl::PointCloud<pcl::PointXYZ>);
+        pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_laserscan_cropped(new pcl::PointCloud<pcl::PointXYZ>);
         Eigen::Vector2d actualMeasurement;
 
-        *pcl_landmark_target = stored_landmarks[i].pointcloud;
+        *landmark_target = stored_landmarks[i].pointcloud;
         geometry_msgs::TransformStamped toVelodynetransform;
         // ToDo: statt punktwolke zu verschieben Initial guess bei icp.align() angeben
         try
@@ -284,61 +316,85 @@ public:
         catch (tf2::TransformException &ex)
         {
             ROS_WARN("%s", ex.what());
-            actualMeasurement(0) = -1;
-            return actualMeasurement;
         }
 
         tf::Transform transform;
         tf::transformMsgToTF(toVelodynetransform.transform, transform);
         geometry_msgs::TransformStamped toOdomtransform;
         tf::transformTFToMsg(transform.inverse(), toOdomtransform.transform);
-
-        pcl::transformPointCloud(*pcl_landmark_target, *pcl_landmark_target, tf2::transformToEigen(toVelodynetransform).matrix());
-        // The Iterative Closest Point algorithm
-        // ToDo: Fine tunen
-        // ToDo: Kann die PCL den Coherent Point Drift (CPD) Algorithmus???? (https://github.com/gadomski/cpd)
-        pcl::IterativeClosestPoint<pcl::PointXYZ, pcl::PointXYZ> icp;
-        icp.setInputSource(pcl_landmark_target);
-        icp.setInputTarget(pcl_laserscan);
-        icp.align(*pcl_landmark_target);
-
-        double fitnessScore = icp.getFitnessScore();
-
-        if (fitnessScore < fitnessScoreThreshhold)
+        // In world coordinates sotored LM's are getting transformed into the velodyne frame
+        pcl::transformPointCloud(*landmark_target, *landmark_target, tf2::transformToEigen(toVelodynetransform).matrix());
+        geometry_msgs::Point landmarkPose(stored_landmarks[i].pose);
+        tf2::doTransform(landmarkPose, landmarkPose, toVelodynetransform);
+        // Isolate only the section of the laserscan where the LM is expected
+        if (reduceLaserscan)
         {
-            *convergedLMs += *pcl_landmark_target;
-            meanFitnessScore += fitnessScore;
-
-            geometry_msgs::Point landmarkPose(stored_landmarks[i].pose);
-            tf2::doTransform(landmarkPose, landmarkPose, toVelodynetransform);
-            publishMeasuredLMpose(landmarkPose, i * 2);
-
-            double x_mean = 0;
-            double y_mean = 0;
-            for (pcl::PointCloud<pcl::PointXYZ>::iterator it = pcl_landmark_target->begin(); it != pcl_landmark_target->end(); it++)
-            {
-                x_mean += it->x;
-                y_mean += it->y;
-            }
-            x_mean /= pcl_landmark_target->size();
-            y_mean /= pcl_landmark_target->size();
-            landmarkPose.x = x_mean;
-            landmarkPose.y = y_mean;
-
-            publishMeasuredLMpose(landmarkPose, i * 2 + 1);
-            tf2::doTransform(landmarkPose, landmarkPose, toOdomtransform);
-
-            Eigen::Vector2d delta_actual;
-            delta_actual(0) = landmarkPose.x - state_vector(0);
-            delta_actual(1) = landmarkPose.y - state_vector(1);
-
-            double q = delta_actual.transpose() * delta_actual;
-            actualMeasurement(0) = sqrt(q);
-            actualMeasurement(1) = constrain_angle(atan2(delta_actual(1), delta_actual(0)) - state_vector(2));
+            pcl::CropBox<pcl::PointXYZ> boxFilter(true);
+            boxFilter.setMin(Eigen::Vector4f(landmarkPose.x - 0.5, landmarkPose.y - 0.5, -0.3877, 1.0));
+            boxFilter.setMax(Eigen::Vector4f(landmarkPose.x + 0.5, landmarkPose.y + 0.5, 2.0, 1.0));
+            boxFilter.setInputCloud(pcl_laserscan);
+            boxFilter.filter(*pcl_laserscan_cropped);
         }
         else
         {
-            actualMeasurement(0) = -1;
+            *pcl_laserscan_cropped = *pcl_laserscan;
+        }
+
+        pointsToProcessByICP += pcl_laserscan_cropped->size();
+        *reducedLaserscan += *pcl_laserscan_cropped;
+        // The Iterative Closest Point algorithm
+        if (!pcl_laserscan_cropped->empty())
+        {
+            pcl::IterativeClosestPoint<pcl::PointXYZ, pcl::PointXYZ> icp;
+            icp.setInputSource(landmark_target);
+            icp.setInputTarget(pcl_laserscan_cropped);
+            ros::WallTime startTime, endTime;
+            startTime = ros::WallTime::now();
+            icp.align(*landmark_target);
+            endTime = ros::WallTime::now();
+            ICPexecutionTime += (endTime - startTime).toNSec() * 1e-6;
+
+            double fitnessScore = icp.getFitnessScore();
+            std::cout << "mean squared distance of LM" << i << ": " << fitnessScore << std::endl;
+            if (fitnessScore < fitnessScoreThreshhold || (numberOfDetectedLandmarksLast == 0 && fitnessScore < fitnessScoreThreshhold +0.092))
+            {
+                *convergedLMs += *landmark_target;
+                meanFitnessScore += fitnessScore;
+                numberOfDetectedLandmarks++;
+                // Workaround do determine measured landmark pose because shifting the stored landmark pose with the transformation returned by the ICP did not work for some reason.
+                double x_mean = 0;
+                double y_mean = 0;
+                for (pcl::PointCloud<pcl::PointXYZ>::iterator it = landmark_target->begin(); it != landmark_target->end(); it++)
+                {
+                    x_mean += it->x;
+                    y_mean += it->y;
+                }
+                x_mean /= landmark_target->size();
+                y_mean /= landmark_target->size();
+                landmarkPose.x = x_mean;
+                landmarkPose.y = y_mean;
+
+                publishMeasuredLMpose(landmarkPose, i);
+                tf2::doTransform(landmarkPose, landmarkPose, toOdomtransform);
+
+                Eigen::Vector2d delta_actual;
+                delta_actual(0) = landmarkPose.x - state_vector(0);
+                delta_actual(1) = landmarkPose.y - state_vector(1);
+
+                double q = delta_actual.transpose() * delta_actual;
+                actualMeasurement(0) = sqrt(q);
+                actualMeasurement(1) = constrain_angle(atan2(delta_actual(1), delta_actual(0)) - state_vector(2));
+
+                Q << 20, 0,
+                    0, 80;
+                Q = Q * (fitnessScore / fitnessScoreThreshhold);
+                if (Q(0, 0) < 5)
+                    Q << 5, 0, 0, 20;
+                std::cout << "Q: " << Q << std::endl;
+            }
+            else
+            {
+            }
         }
         return actualMeasurement;
     }
@@ -398,6 +454,18 @@ public:
         state_vector(2) += (double)(req.t * M_PI) / 180;
 
         return true;
+    }
+
+    void publishWheelOdometry(ros::Time stamp)
+    {
+        nav_msgs::Odometry currentWheelOdometry;
+        currentWheelOdometry.pose.pose.position.x = state_vector_wheel_odom(0);
+        currentWheelOdometry.pose.pose.position.y = state_vector_wheel_odom(1);
+        currentWheelOdometry.pose.pose.orientation = tf2::toMsg(getQuat(state_vector_wheel_odom(2)));
+        currentWheelOdometry.child_frame_id = "base_footprint";
+        currentWheelOdometry.header.frame_id = "odom";
+        currentWheelOdometry.header.stamp = stamp;
+        wheelOdometryPublisher.publish(currentWheelOdometry);
     }
 
     double constrain_angle(double radian)
@@ -460,22 +528,26 @@ public:
 
     void publishMeasuredLMpose(geometry_msgs::Point landmarkPose, int i)
     {
-        int cov_index = 3 + 2 * i;
+        visualization_msgs::Marker measuredLMpose;
         measuredLMpose.header.frame_id = "velodyne";
         measuredLMpose.header.stamp = ros::Time::now();
         measuredLMpose.ns = "measured_landmark_pose";
         measuredLMpose.action = visualization_msgs::Marker::ADD;
         measuredLMpose.pose.orientation.w = 1.0;
         measuredLMpose.id = i;
-        measuredLMpose.type = visualization_msgs::Marker::LINE_LIST;
-        measuredLMpose.scale.x = 0.03;
-        measuredLMpose.color.r = 0.5;
+        measuredLMpose.type = visualization_msgs::Marker::TEXT_VIEW_FACING;
+        measuredLMpose.scale.z = 0.2;
+        measuredLMpose.color.r = 1.0;
         measuredLMpose.color.g = 1.0;
+        measuredLMpose.color.b = 1.0;
         measuredLMpose.color.a = 1.0;
 
-        measuredLMpose.points.push_back(landmarkPose);
-        landmarkPose.z = 1;
-        measuredLMpose.points.push_back(landmarkPose);
+        measuredLMpose.text = std::to_string(i);
+
+        measuredLMpose.pose.position.x = landmarkPose.x;
+        measuredLMpose.pose.position.y = landmarkPose.y;
+
+        measuredLMposePublisher.publish(measuredLMpose);
     }
 
     void publishEllipses()
@@ -589,6 +661,7 @@ private:
     ros::Publisher currentStatePublisher;
     ros::Publisher storedLandmarksPublisher;
     ros::Publisher convergedLandmarksPublisher;
+    ros::Publisher reducedLasercanPublisher;
     ros::Publisher predictedMeasPublisher;
     ros::Publisher measuredLMposePublisher;
 
@@ -607,13 +680,16 @@ private:
     double robotBase;
     double robotWheelRadius;
     double fitnessScoreThreshhold;
+    bool reduceLaserscan;
 
     Eigen::Vector3d state_vector_wheel_odom; // Zustandsvektor ohne Correction...also nur Wheel Odomentry
     Eigen::VectorXd state_vector;            // Zustands Vektor der Pose und der Landmarken
-    Eigen::VectorXd state_vector_last;       // Zustands Vektor der Pose und der Landmarken bei letztem Aufruf der Predict Methode
     Eigen::MatrixXd Cov;                     // Covarianzmatrix des Zustandsvekotors (Roboterpose und Landmarken)
     int numberOfStoredLandmarks;
     int numberOfDetectedLandmarks;
+    double pointsToProcessByICP;
+    double ICPexecutionTime;
+    int numberOfDetectedLandmarksLast;
 
     double alphaRightLast;
     double alphaLeftLast;
@@ -634,7 +710,7 @@ private:
     tf::TransformBroadcaster br;
     geometry_msgs::TransformStamped transformStamped;
 
-    visualization_msgs::Marker predictedMeas, actualMeas, measuredLMpose;
+    visualization_msgs::Marker predictedMeas, actualMeas;
 
     double meanFitnessScore;
 };

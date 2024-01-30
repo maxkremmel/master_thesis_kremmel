@@ -1,11 +1,9 @@
 <?xml version="1.0"?>
 <launch>
   <arg name="file_server" default="true" />
-  <arg name="teleop" default="true" />
-  <arg name="joy_teleop" default="false" />
+  <arg name="teleop" default="false" />
   <arg name="myEKF" default="true" />
   <arg name="kiss_icp" default="false" />
-  <arg name="lio-sam" default="false" />
   <arg name="gui" default="false" />
   <arg name="rviz" default="true" />
   <arg name="x_pos" default="-6.5" />
@@ -49,28 +47,13 @@ Test World names:
     </node>
   </group>
 
-  <group if="$(arg joy_teleop)">
-    <arg name="joy_dev" default="/dev/input/js0" />
-    <arg name="config_filepath" default="$(find master_thesis_kremmel)/config/xbox.yaml" />
-    
-    <node pkg="joy" type="joy_node" name="joy_node">
-      <param name="dev" value="$(arg joy_dev)" />
-      <param name="deadzone" value="0.3" />
-      <param name="autorepeat_rate" value="20" />
-    </node>
-
-    <node pkg="teleop_twist_joy" name="teleop_twist_joy" type="teleop_node">
-      <rosparam command="load" file="$(arg config_filepath)" />
-    </node>
-  </group>
-
   <!-- Start KISS-ICP -->
   <group if="$(arg kiss_icp)">
     <include file="$(find kiss_icp)/launch/odometry.launch">
-      <arg name="visualize" default="false" />
+      <arg name="visualize" default="true" />
       <arg name="odom_frame" default="odom" />
-      <arg name="child_frame" default="base_link" />
-      <arg name="topic" default="transformed_laserscan" />
+      <arg name="base_frame" default="base_footprint" />
+      <arg name="topic" default="velodyne_points" />
     </include>
   </group>
 
@@ -80,10 +63,10 @@ Test World names:
       args="-d $(find master_thesis_kremmel)/config/rviz.rviz" />
   </group>
 
+  <node pkg="tf2_ros" type="static_transform_publisher" name="world_to_odom" args="0 0 0 0 0 0 world odom" />
+
   <!-- Start implemented EKF -->
   <group if="$(arg myEKF)">
-    <node pkg="tf2_ros" type="static_transform_publisher" name="world_to_odom" args="0 0 0 0 0 0 world odom" />
-
     <node name="LandmarkProcessor" type="LandmarkProcessor" pkg="master_thesis_kremmel" output="screen" />
       <node name="EKFSlam" type="EKFSlam" pkg="master_thesis_kremmel" output="screen">
       <param name="x_pos" value="$(arg x_pos)" />
@@ -93,6 +76,7 @@ Test World names:
       <param name="robotWheelRadius" value="0.033" />
       <param name="fitnessScoreThreshhold" value="0.008" />
       <param name="maxNumLandmarks" value="30" />
+      <param name="reduceLaserscan" value="true" />
     </node>
   </group>
 

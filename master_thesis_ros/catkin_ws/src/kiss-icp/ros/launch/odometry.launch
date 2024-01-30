@@ -2,17 +2,16 @@
 <launch>
   <!-- ROS paramaters -->
   <arg name="bagfile" default=""/>
-  <arg name="visualize" default="true"/>
+  <arg name="visualize" default="false"/>
   <arg name="odom_frame" default="odom"/>
-  <arg name="child_frame" default="base_link"/>
+  <arg name="base_frame" default=""/>
   <arg name="topic" default=""/>
-  <arg name="publish_odom_tf" default="fals"/>
-  <arg name="publish_alias_tf" default="true"/>
+  <arg name="publish_odom_tf" default="true"/>
 
   <!-- KISS-ICP paramaters -->
   <arg name="deskew" default="false"/>
-  <arg name="max_range" default="100.0" />
-  <arg name="min_range" default="5.0" />
+  <arg name="max_range" default="30.0" />
+  <arg name="min_range" default="0.9" />
   <arg name="voxel_size" default="" />
 
   <!-- Odometry node -->
@@ -20,9 +19,9 @@
     <!-- ROS params -->
     <remap from="pointcloud_topic" to="$(arg topic)"/>
     <param name="odom_frame" value="$(arg odom_frame)"/>
-    <param name="child_frame" value="$(arg child_frame)"/>
+    <param name="base_frame" value="$(arg base_frame)"/>
     <param name="publish_odom_tf" value="$(arg publish_odom_tf)"/>
-    <param name="publish_alias_tf" value="$(arg publish_alias_tf)"/>
+    <param name="visualize" value="$(arg visualize)"/>
     <!-- KISS-ICP params -->
     <param name="max_range" value="$(arg max_range)"/>
     <param name="min_range" value="$(arg min_range)"/>

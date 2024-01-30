@@ -88,11 +88,6 @@ public:
         ROS_INFO("++++++++++++++++++   Got new LandMark   +++++++++++++++++");
         pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_cloud(new pcl::PointCloud<pcl::PointXYZ>);
         pcl::fromROSMsg(*input, *pcl_cloud);
-        // Downsample of LM Pointcloud:
-        /* pcl::VoxelGrid<pcl::PointXYZ> sor;
-        sor.setInputCloud(pcl_cloud);
-        sor.setLeafSize(0.1f, 0.1f, 0.1f);
-        sor.filter(*pcl_cloud); */
         // Store LM:
         // Calculate Pose of LM using mean of XYZ coordinates off all poits
         float x_mean = 0;
@@ -116,8 +111,6 @@ public:
                 lm_pointcloud.push_back(point);
                 it++;
             }
-
-            // ToDo: Eventuell noch Punktwolke komprimieren
         }
         if (lm_pointcloud.empty())
         {
@@ -139,7 +132,6 @@ public:
                 abs(it.value()["pose"].at(1).get<float>() - y_mean) < 0.2 &&
                 abs(it.value()["pose"].at(2).get<float>() - z_mean) < 0.2)
             {
-                // ToDo: Evetuell noch prüfen ob Punktwolken übereinstimmen und nur wenn nicht auch speichern
                 std::cout << "LM already stored" << std::endl;
                 store_new_landmark = false;
                 break;
@@ -155,7 +147,6 @@ public:
 
             stored_landmarks["landmarks"].push_back(new_landmark);
             // send Landmark to EKF Node
-
             master_thesis_kremmel::Landmark srv;
             srv.request.x = x_mean;
             srv.request.y = y_mean;

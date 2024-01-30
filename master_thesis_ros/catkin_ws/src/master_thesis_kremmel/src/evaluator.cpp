@@ -16,12 +16,13 @@ public:
     Evaluator(ros::NodeHandle &nTemp) : n(nTemp)
     {
         groundTruthSubscriber.subscribe(n, "/ground_truth/state", 1);
-        wheelOdometrySubscriber.subscribe(n, "/ekf_slam/wheel_odometry", 1);
-        ekfOdometrySubscriber.subscribe(n, "/ekf_slam/current_state", 1);
+        // wheelOdometrySubscriber.subscribe(n, "/ekf_slam/wheel_odometry", 1);
+        // ekfOdometrySubscriber.subscribe(n, "/ekf_slam/current_state", 1);
         kissOdometrySubscriber.subscribe(n, "/kiss/odometry", 1);
-        v_w_numLM_meanFsSubscriber.subscribe(n, "/ekf_slam/vel", 1);
-        sync.reset(new Sync(SyncRule(10), groundTruthSubscriber, wheelOdometrySubscriber, ekfOdometrySubscriber, v_w_numLM_meanFsSubscriber));
-        sync->registerCallback(boost::bind(&Evaluator::callback, this, _1, _2, _3, _4)); // Zuweisen des synchronisierten Callbacks
+        // v_w_numLM_meanFsSubscriber.subscribe(n, "/ekf_slam/vel", 1);
+        // sync.reset(new Sync(SyncRule(10), groundTruthSubscriber, wheelOdometrySubscriber, ekfOdometrySubscriber, v_w_numLM_meanFsSubscriber));
+        sync.reset(new Sync(SyncRule(1000), groundTruthSubscriber, kissOdometrySubscriber));
+        sync->registerCallback(boost::bind(&Evaluator::callback, this, _1, _2)); // Zuweisen des synchronisierten Callbacks
 
         std::string packagePath = ros::package::getPath("master_thesis_kremmel");
         std::string csvPath = packagePath + "/results/results.csv";
@@ -37,13 +38,18 @@ public:
         results.close();
     }
 
-    void callback(const nav_msgs::Odometry::ConstPtr &groundTruthMsg, const nav_msgs::Odometry::ConstPtr &wheelOdomMsg,
-                  const nav_msgs::Odometry::ConstPtr &ekfOdomMsg, const nav_msgs::Odometry::ConstPtr &v_w_numLM_meanFsMsg)
+    void callback(const nav_msgs::Odometry::ConstPtr &groundTruthMsg, const nav_msgs::Odometry::ConstPtr &kissOdomMsg)
     {
-        results << v_w_numLM_meanFsMsg->twist.twist.linear.x << "," << v_w_numLM_meanFsMsg->twist.twist.angular.z << "," << v_w_numLM_meanFsMsg->pose.pose.position.x << "," << v_w_numLM_meanFsMsg->pose.pose.position.y
+        /* if(groundTruthMsg->pose.pose.position.x > -6.9 && groundTruthMsg->pose.pose.position.x < -4.5){
+           results << v_w_numLM_meanFsMsg->twist.twist.linear.x << "," << v_w_numLM_meanFsMsg->twist.twist.angular.z << "," << v_w_numLM_meanFsMsg->pose.pose.position.x << "," << v_w_numLM_meanFsMsg->pose.pose.position.y << "," << v_w_numLM_meanFsMsg->pose.pose.position.z << "," << v_w_numLM_meanFsMsg->pose.pose.orientation.x
                 << "," << ekfOdomMsg->pose.pose.position.x << "," << ekfOdomMsg->pose.pose.position.y << "," << constrain_angle(getYaw(ekfOdomMsg))
                 << "," << wheelOdomMsg->pose.pose.position.x << "," << wheelOdomMsg->pose.pose.position.y << "," << constrain_angle(getYaw(wheelOdomMsg))
                 << "," << groundTruthMsg->pose.pose.position.x << "," << groundTruthMsg->pose.pose.position.y << "," << constrain_angle(getYaw(groundTruthMsg))
+                << "\n";
+        } */
+
+        results << groundTruthMsg->pose.pose.position.x << "," << groundTruthMsg->pose.pose.position.y << "," << constrain_angle(getYaw(groundTruthMsg))
+                << "," << kissOdomMsg->pose.pose.position.x << "," << kissOdomMsg->pose.pose.position.y << "," << constrain_angle(getYaw(kissOdomMsg))
                 << "\n";
     }
 
@@ -81,7 +87,8 @@ private:
     message_filters::Subscriber<nav_msgs::Odometry> ekfOdometrySubscriber;
     message_filters::Subscriber<nav_msgs::Odometry> kissOdometrySubscriber;
     message_filters::Subscriber<nav_msgs::Odometry> v_w_numLM_meanFsSubscriber;
-    typedef message_filters::sync_policies::ApproximateTime<nav_msgs::Odometry, nav_msgs::Odometry, nav_msgs::Odometry, nav_msgs::Odometry> SyncRule;
+    //typedef message_filters::sync_policies::ApproximateTime<nav_msgs::Odometry, nav_msgs::Odometry, nav_msgs::Odometry, nav_msgs::Odometry> SyncRule;
+    typedef message_filters::sync_policies::ApproximateTime<nav_msgs::Odometry, nav_msgs::Odometry> SyncRule;
     typedef message_filters::Synchronizer<SyncRule> Sync;
     boost::shared_ptr<Sync> sync;
 
